@@ -1,0 +1,9 @@
+# Build outputs
+/bin/
+/obj/
+
+# IDE/user-specific files
+*.user
+
+# Local config
+App.config
