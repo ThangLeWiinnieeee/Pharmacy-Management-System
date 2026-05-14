@@ -61,7 +61,13 @@ namespace PharmacyManagementSystem
             Hide();
 
             using var mainForm = new MainForm(user);
-            mainForm.ShowDialog(this);
+            var dialogResult = mainForm.ShowDialog(this);
+
+            if (dialogResult == DialogResult.Retry)
+            {
+                ShowForNextLogin();
+                return;
+            }
 
             Close();
         }
@@ -71,9 +77,24 @@ namespace PharmacyManagementSystem
             Hide();
 
             using var staffHomeForm = new StaffHomeForm(user);
-            staffHomeForm.ShowDialog(this);
+            var dialogResult = staffHomeForm.ShowDialog(this);
+
+            if (dialogResult == DialogResult.Retry)
+            {
+                ShowForNextLogin();
+                return;
+            }
 
             Close();
+        }
+
+        private void ShowForNextLogin()
+        {
+            textBoxUsername.Text = string.Empty;
+            textBoxPassword.Text = string.Empty;
+            Show();
+            Activate();
+            textBoxUsername.Focus();
         }
     }
 }

@@ -5,6 +5,9 @@ namespace PharmacyManagementSystem
 {
     public class RoundedButton : Button
     {
+        private static readonly Size HeaderButtonSize = new(126, 38);
+        private static readonly Size ActionButtonSize = new(132, 38);
+
         private int _borderRadius = 10;
         private int _borderSize;
         private Color _borderColor = Color.Transparent;
@@ -16,6 +19,55 @@ namespace PharmacyManagementSystem
             FlatStyle = FlatStyle.Flat;
             FlatAppearance.BorderSize = 0;
             ResizeRedraw = true;
+        }
+
+        public static RoundedButton CreateHeaderLogoutButton(Point location)
+        {
+            return CreateStandardButton(
+                "Đăng xuất",
+                location,
+                HeaderButtonSize,
+                Color.FromArgb(248, 249, 250),
+                Color.FromArgb(0, 86, 179),
+                Color.FromArgb(224, 239, 255),
+                AnchorStyles.Top | AnchorStyles.Right);
+        }
+
+        public static RoundedButton CreateActionButton(string text, Color accentColor, Point location)
+        {
+            return CreateStandardButton(
+                text,
+                location,
+                ActionButtonSize,
+                accentColor,
+                Color.White,
+                ControlPaint.Dark(accentColor, 0.08F));
+        }
+
+        private static RoundedButton CreateStandardButton(
+            string text,
+            Point location,
+            Size size,
+            Color backColor,
+            Color foreColor,
+            Color hoverBackColor,
+            AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left)
+        {
+            return new RoundedButton
+            {
+                Anchor = anchor,
+                BackColor = backColor,
+                BorderRadius = 12,
+                BorderSize = 0,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point),
+                ForeColor = foreColor,
+                HoverBackColor = hoverBackColor,
+                Location = location,
+                Size = size,
+                Text = text,
+                UseVisualStyleBackColor = false
+            };
         }
 
         [Category("Appearance")]

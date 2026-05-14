@@ -1,6 +1,6 @@
 # PharmacyManagementSystem
 
-Ứng dụng desktop WinForms quản lý nhà thuốc. Dự án theo kiến trúc 3-layer và MVP:
+Ung dung desktop Windows Forms de quan ly nha thuoc. Project dang di theo kien truc 3-layer va MVP:
 
 ```text
 GUI -> Presenter -> BLL -> DAL -> Database
@@ -10,104 +10,135 @@ GUI -> Presenter -> BLL -> DAL -> Database
 
 - .NET 8 (`net8.0-windows`)
 - Windows Forms
-- Entity Framework Core 8
+- Entity Framework Core SQL Server 8
 - SQL Server
+- `System.Configuration.ConfigurationManager` de doc connection string tu `App.config`
 
-## Yêu Cầu
+## Yeu Cau
 
 - Windows
 - .NET SDK 8
-- SQL Server
+- SQL Server LocalDB/Express/Developer hoac SQL Server tuong duong
+- Visual Studio hoac CLI `dotnet`
 
-## Cài Đặt
+## Cai Dat
 
-1. Mở solution `PharmacyManagementSystem.slnx`.
-2. Tạo file `PharmacyManagementSystem/App.config` từ file mẫu `PharmacyManagementSystem/App.config.example`.
-3. Điền thông tin SQL Server của máy đang chạy vào `App.config`.
-4. Tạo database và bảng trong SQL Server Management Studio theo schema tương ứng với `Entities` và `AppDbContext`.
-5. Restore packages nếu IDE chưa tự động restore.
+1. Mo solution `PharmacyManagementSystem.slnx`.
+2. Tao database `PharmacyManagementSystemDb` trong SQL Server.
+3. Chay cac script trong folder `SQL_Database/` de tao bang hien co:
+   - `User.sql`
+   - `Medicines.sql`
+4. Tao file `PharmacyManagementSystem/App.config` tu file mau `PharmacyManagementSystem/App.config.example`.
+5. Sua connection string `PharmacyDb` trong `App.config` cho dung SQL Server tren may dang chay.
+6. Restore NuGet packages neu IDE chua tu dong restore.
 
-## Chạy Dự Án
+`App.config` la cau hinh cuc bo. Khong dua connection string that, ten may noi bo, tai khoan hoac mat khau vao README.
+
+## Chay Du An
 
 ### Visual Studio
 
-1. Mở `PharmacyManagementSystem.slnx`.
-2. Set project `PharmacyManagementSystem` làm startup project.
-3. Run bằng F5.
+1. Mo `PharmacyManagementSystem.slnx`.
+2. Set project `PharmacyManagementSystem` lam startup project.
+3. Chay bang F5.
 
 ### CLI
 
-Từ thư mục gốc solution:
+Tu thu muc goc solution:
 
 ```powershell
 dotnet build PharmacyManagementSystem/PharmacyManagementSystem.csproj
 dotnet run --project PharmacyManagementSystem/PharmacyManagementSystem.csproj
 ```
 
-## Cấu Trúc Chính
+Hoac tu thu muc project con `PharmacyManagementSystem/`:
+
+```powershell
+dotnet build
+dotnet run
+```
+
+## Cau Truc Chinh
 
 ```text
 PharmacyManagementSystem/
 |-- PharmacyManagementSystem.slnx
+|-- AGENTS.md
+|-- SQL_Database/
+|   |-- User.sql
+|   `-- Medicines.sql
 `-- PharmacyManagementSystem/
-    |-- GUI/            # WinForms (View)
-    |-- Presenters/     # Presenter (MVP)
-    |-- BLL/            # Business Logic
-    |   `-- Validations/ # Validate nghiệp vụ/input
-    |-- DAL/            # Data Access
+    |-- Program.cs
+    |-- App.config.example
+    |-- GUI/            # Windows Forms views
+    |   `-- Controls/   # RoundedButton, RoundedPanel, RoundedTextBox
+    |-- Presenters/     # Presenter layer
+    |-- BLL/            # Business logic
+    |   `-- Validations/
+    |-- DAL/            # EF Core data access
     |-- Interfaces/
     |   |-- IBLL/
     |   |-- IDAL/
     |   `-- IView/
     |-- DTO/
-    |   |-- Input/      # DTO nhận dữ liệu từ form/request
-    |   `-- Output/     # DTO trả dữ liệu/kết quả ra ngoài
-    |-- Entities/
-    |-- App.config.example
-    `-- Program.cs      # Entry point
+    |   |-- Input/
+    |   `-- Output/
+    `-- Entities/
 ```
 
-## Chức Năng Hiện Tại
+## Chuc Nang Hien Tai
 
-| Chức năng | Form | Trạng thái |
-|-----------|------|------------|
-| Đăng nhập | `LoginForm` | Đã xác thực tài khoản và mở `MainForm` |
-| Đăng ký tài khoản | `RegisterForm` | Đã validate, hash mật khẩu và lưu vào `Users` |
-| Dashboard | `MainForm` | Thống kê thuốc, tồn kho, Admin, Staff và người dùng |
-| Khu vực nhân viên | `StaffHomeForm` | Màn hình làm việc cho tài khoản Staff |
+| Chuc nang | Man hinh | Trang thai |
+|-----------|----------|------------|
+| Dang nhap | `LoginForm` | Validate input, verify mat khau PBKDF2, kiem tra active, dieu huong theo role |
+| Dang ky | `RegisterForm` | Validate input, hash mat khau PBKDF2, tao tai khoan role `Staff` |
+| Dashboard Admin | `MainForm` | Thong ke thuoc, ton kho, sap het hang, sap het han, Admin, Staff, user active |
+| Khu vuc Staff | `StaffHomeForm` | Man hinh lam viec co ban cho tai khoan Staff |
+| Dang xuat | `MainForm`, `StaffHomeForm` | Quay lai `LoginForm` de dang nhap tai khoan khac |
+| Database check | `Program.cs`, `DatabaseInitializer` | Kiem tra ket noi database khi khoi dong app |
 
-## Luồng Chạy Hiện Tại
+## Luong Chay
 
-1. Ứng dụng chạy từ `Program.cs`.
-2. Ứng dụng kiểm tra kết nối database.
-3. Nếu kết nối thành công, màn hình `LoginForm` được mở.
-4. Người dùng có thể chuyển từ `LoginForm` sang `RegisterForm`.
-5. `RegisterForm` tạo tài khoản Staff mới khi database đã có bảng `Users`.
-6. `LoginForm` xác thực tài khoản và điều hướng theo role.
-7. Role `Admin` mở dashboard `MainForm`; role `Staff` mở `StaffHomeForm`.
+1. App chay tu `Program.cs`.
+2. `DatabaseInitializer` kiem tra ket noi database.
+3. Neu ket noi thanh cong, app mo `LoginForm`.
+4. Nguoi dung co the dang nhap hoac mo `RegisterForm` de dang ky.
+5. Tai khoan dang ky moi mac dinh role `Staff`.
+6. Dang nhap thanh cong se dieu huong theo role:
+   - `Admin` mo `MainForm`
+   - `Staff` mo `StaffHomeForm`
+7. Nut dang xuat tren `MainForm`/`StaffHomeForm` dong man hinh hien tai va hien lai `LoginForm`.
 
-## Luồng Nghiệp Vụ Mục Tiêu
+## Database
 
-- Đăng nhập: kiểm tra thông tin và điều hướng vào màn hình chính.
-- Đăng ký: tạo tài khoản, lưu thông tin cơ bản.
-- Quản lý thuốc: thêm, sửa, xóa, tìm kiếm và theo dõi số lượng thuốc.
-- Lập hóa đơn: nhập thuốc, tính tổng tiền, lưu hóa đơn.
+`AppDbContext` hien co:
 
-## Quy Ước Code
+- `DbSet<User>` mapping bang `Users`
+- `DbSet<Medicine>` mapping bang `Medicines`
 
-- GUI chỉ xử lý UI, không viết business logic.
-- Presenter điều phối giữa View và BLL.
-- BLL chứa nghiệp vụ và gọi DAL.
-- DAL chỉ chịu trách nhiệm truy xuất dữ liệu bằng EF/LINQ, không viết SQL thuần trong code.
-- DTO dùng để truyền dữ liệu giữa các tầng; `DTO/Input` nhận dữ liệu vào, `DTO/Output` trả dữ liệu ra.
-- Entity dùng cho mapping database.
-- Hệ thống chỉ dùng 2 role: `Admin` và `Staff`; tài khoản đăng ký mới mặc định là `Staff`.
+Project hien chua dung EF Core migration. Schema database duoc tao/cap nhat thu cong bang SQL Server Management Studio va cac script trong `SQL_Database/`.
 
-## Ghi Chú
+## Quy Uoc Chinh
 
-- `App.config` là file cấu hình cục bộ và không commit lên repository.
-- Xem mẫu cấu hình trong `PharmacyManagementSystem/App.config.example`.
-- Không đưa connection string thật, tên máy, tài khoản, mật khẩu hoặc thông tin môi trường nội bộ vào README.
-- Database schema được tạo/cập nhật thủ công trong SQL Server Management Studio.
-- `AppDbContext` hiện có `DbSet<User>` và `DbSet<Medicine>`.
-- Đăng ký và đăng nhập đã dùng mật khẩu hash PBKDF2; migration, report/RDLC chưa implement.
+- GUI chi xu ly UI, doc input, bind data va goi Presenter.
+- Presenter dieu phoi giua View va BLL.
+- BLL chua nghiep vu, validation va goi DAL qua interface.
+- DAL chi truy xuat du lieu bang EF/LINQ, khong viet SQL thuan trong C#.
+- DTO dung de truyen du lieu giua cac tang.
+- Entity dung cho EF Core/database mapping.
+- Role hien tai chi gom `Admin` va `Staff`.
+- Mat khau khong luu plain text; login/register dung PBKDF2.
+
+## Trang Thai Chua Hoan Thien
+
+- Chua co EF Core migration.
+- Chua co report/RDLC.
+- Chua co Guna UI.
+- Chua implement day du quan ly thuoc, hoa don, khach hang va nhan vien.
+- `MedicineForm.cs`, `ReportForm.cs`, `SearchBarControl.cs` va mot so file Presenter/BLL/DAL/interface lien quan den Medicine/Invoice/Employee/Customer van dang la placeholder rong.
+
+## Ghi Chu
+
+- Xem them quy tac lam viec trong `AGENTS.md`.
+- Neu cap nhat schema khi chua dung migration, can cap nhat dong bo SQL script, Entity, DTO, DAL va BLL lien quan.
+- Neu app khong khoi dong duoc, kiem tra `App.config`, database `PharmacyManagementSystemDb` va cac bang `Users`, `Medicines`.
