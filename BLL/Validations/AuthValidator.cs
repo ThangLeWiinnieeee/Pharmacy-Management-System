@@ -35,8 +35,8 @@ public static class AuthValidator
 
     public static string? ValidateRegister(
         string fullName,
-        string? phone,
-        string? email,
+        string phone,
+        string email,
         string username,
         string password,
         string confirmPassword)
@@ -66,12 +66,22 @@ public static class AuthValidator
             return "Tên đăng nhập chỉ được chứa chữ, số, dấu chấm, gạch dưới hoặc gạch ngang.";
         }
 
-        if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return "Vui lòng nhập email.";
+        }
+
+        if (!IsValidEmail(email))
         {
             return "Email không hợp lệ.";
         }
 
-        if (!string.IsNullOrWhiteSpace(phone) && !PhoneRegex.IsMatch(phone))
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return "Vui lòng nhập số điện thoại.";
+        }
+
+        if (!PhoneRegex.IsMatch(phone))
         {
             return "Số điện thoại không hợp lệ.";
         }

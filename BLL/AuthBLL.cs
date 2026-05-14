@@ -58,8 +58,8 @@ public class AuthBLL : IAuthBLL
     public RegisterResultDTO Register(RegisterUserDTO request)
     {
         var fullName = (request.FullName ?? string.Empty).Trim();
-        var phone = NormalizeOptional(request.Phone);
-        var email = NormalizeOptional(request.Email);
+        var phone = (request.Phone ?? string.Empty).Trim();
+        var email = (request.Email ?? string.Empty).Trim();
         var username = (request.Username ?? string.Empty).Trim().ToLowerInvariant();
         var password = request.Password ?? string.Empty;
         var confirmPassword = request.ConfirmPassword ?? string.Empty;
@@ -153,12 +153,6 @@ public class AuthBLL : IAuthBLL
             Pbkdf2Iterations.ToString(CultureInfo.InvariantCulture),
             Convert.ToBase64String(salt),
             Convert.ToBase64String(hash));
-    }
-
-    private static string? NormalizeOptional(string? value)
-    {
-        var trimmedValue = value?.Trim();
-        return string.IsNullOrWhiteSpace(trimmedValue) ? null : trimmedValue;
     }
 
     private static UserDTO MapToDTO(User user)

@@ -67,10 +67,12 @@ public class AppDbContext : DbContext
             .IsRequired();
 
         user.Property(item => item.Email)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         user.Property(item => item.Phone)
-            .HasMaxLength(20);
+            .HasMaxLength(20)
+            .IsRequired();
 
         user.Property(item => item.Role)
             .HasMaxLength(20)

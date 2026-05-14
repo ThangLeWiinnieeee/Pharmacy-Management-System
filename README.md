@@ -24,7 +24,7 @@ GUI -> Presenter -> BLL -> DAL -> Database
 1. Mở solution `PharmacyManagementSystem.slnx`.
 2. Tạo file `PharmacyManagementSystem/App.config` từ file mẫu `PharmacyManagementSystem/App.config.example`.
 3. Điền thông tin SQL Server của máy đang chạy vào `App.config`.
-4. Tạo database và bảng bằng script `PharmacyManagementSystem/DAL/CreateDatabase.sql`.
+4. Tạo database và bảng trong SQL Server Management Studio theo schema tương ứng với `Entities` và `AppDbContext`.
 5. Restore packages nếu IDE chưa tự động restore.
 
 ## Chạy Dự Án
@@ -98,7 +98,7 @@ PharmacyManagementSystem/
 - GUI chỉ xử lý UI, không viết business logic.
 - Presenter điều phối giữa View và BLL.
 - BLL chứa nghiệp vụ và gọi DAL.
-- DAL chịu trách nhiệm truy xuất dữ liệu.
+- DAL chỉ chịu trách nhiệm truy xuất dữ liệu bằng EF/LINQ, không viết SQL thuần trong code.
 - DTO dùng để truyền dữ liệu giữa các tầng; `DTO/Input` nhận dữ liệu vào, `DTO/Output` trả dữ liệu ra.
 - Entity dùng cho mapping database.
 - Hệ thống chỉ dùng 2 role: `Admin` và `Staff`; tài khoản đăng ký mới mặc định là `Staff`.
@@ -108,6 +108,6 @@ PharmacyManagementSystem/
 - `App.config` là file cấu hình cục bộ và không commit lên repository.
 - Xem mẫu cấu hình trong `PharmacyManagementSystem/App.config.example`.
 - Không đưa connection string thật, tên máy, tài khoản, mật khẩu hoặc thông tin môi trường nội bộ vào README.
-- Database schema được tạo bằng script SQL thuần trong `PharmacyManagementSystem/DAL/CreateDatabase.sql`.
+- Database schema được tạo/cập nhật thủ công trong SQL Server Management Studio.
 - `AppDbContext` hiện có `DbSet<User>` và `DbSet<Medicine>`.
 - Đăng ký và đăng nhập đã dùng mật khẩu hash PBKDF2; migration, report/RDLC chưa implement.
