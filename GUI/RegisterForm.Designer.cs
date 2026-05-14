@@ -73,7 +73,7 @@ namespace PharmacyManagementSystem
             labelHeroNote.Name = "labelHeroNote";
             labelHeroNote.Size = new System.Drawing.Size(270, 62);
             labelHeroNote.TabIndex = 2;
-            labelHeroNote.Text = "Tài khoản khách hàng giúp theo dõi lịch sử mua hàng và thông tin liên hệ.";
+            labelHeroNote.Text = "Tài khoản nhân viên giúp quản lý dữ liệu và thao tác bán hàng trong hệ thống.";
 
             labelHeroSubtitle.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             labelHeroSubtitle.ForeColor = System.Drawing.Color.White;
@@ -81,7 +81,7 @@ namespace PharmacyManagementSystem
             labelHeroSubtitle.Name = "labelHeroSubtitle";
             labelHeroSubtitle.Size = new System.Drawing.Size(270, 72);
             labelHeroSubtitle.TabIndex = 1;
-            labelHeroSubtitle.Text = "Tạo tài khoản khách hàng mới với thông tin cần thiết cho nhà thuốc.";
+            labelHeroSubtitle.Text = "Tạo tài khoản nhân viên mới với thông tin cần thiết cho nhà thuốc.";
 
             labelHeroTitle.Font = new System.Drawing.Font("Segoe UI", 23F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             labelHeroTitle.ForeColor = System.Drawing.Color.White;
@@ -301,7 +301,7 @@ namespace PharmacyManagementSystem
             labelSubtitle.Name = "labelSubtitle";
             labelSubtitle.Size = new System.Drawing.Size(456, 48);
             labelSubtitle.TabIndex = 1;
-            labelSubtitle.Text = "Nhập thông tin khách hàng để tạo tài khoản mới.";
+            labelSubtitle.Text = "Nhập thông tin nhân viên để tạo tài khoản mới.";
 
             labelTitle.AutoSize = true;
             labelTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);

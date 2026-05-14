@@ -5,5 +5,4 @@
 # IDE/user-specific files
 *.user
 
-# Local config
-App.config
+/App.config

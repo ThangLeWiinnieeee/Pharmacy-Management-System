@@ -118,7 +118,7 @@ namespace PharmacyManagementSystem
             labelHelpText.Name = "labelHelpText";
             labelHelpText.Size = new System.Drawing.Size(356, 34);
             labelHelpText.TabIndex = 9;
-            labelHelpText.Text = "Chưa có tài khoản? Chọn đăng ký để tạo tài khoản khách hàng.";
+            labelHelpText.Text = "Chưa có tài khoản? Chọn đăng ký để tạo tài khoản nhân viên.";
             labelHelpText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
             buttonExit.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);

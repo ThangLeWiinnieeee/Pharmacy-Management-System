@@ -1,6 +1,6 @@
-namespace PharmacyManagementSystem.Entities;
+namespace PharmacyManagementSystem.DTO.Output;
 
-public class Medicine
+public class MedicineDTO
 {
     public int Id { get; set; }
 
@@ -22,7 +22,7 @@ public class Medicine
 
     public string? Description { get; set; }
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; }
 }

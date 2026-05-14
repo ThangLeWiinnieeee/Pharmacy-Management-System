@@ -1,12 +1,10 @@
-namespace PharmacyManagementSystem.Entities;
+namespace PharmacyManagementSystem.DTO.Output;
 
-public class User
+public class UserDTO
 {
     public int Id { get; set; }
 
     public string Username { get; set; } = string.Empty;
-
-    public string PasswordHash { get; set; } = string.Empty;
 
     public string FullName { get; set; } = string.Empty;
 
@@ -14,11 +12,11 @@ public class User
 
     public string? Phone { get; set; }
 
-    public string Role { get; set; } = "Staff";
+    public string Role { get; set; } = string.Empty;
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 }
