@@ -4,5 +4,6 @@
 
 # IDE/user-specific files
 *.user
+*.csproj.lscache
 
 /App.config

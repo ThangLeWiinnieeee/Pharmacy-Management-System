@@ -1,6 +1,6 @@
 # PharmacyManagementSystem
 
-Ung dung desktop Windows Forms de quan ly nha thuoc. Project dang di theo kien truc 3-layer va MVP:
+Ung dung desktop Windows Forms de quan ly nha thuoc. Project su dung kien truc 3-layer ket hop MVP:
 
 ```text
 GUI -> Presenter -> BLL -> DAL -> Database
@@ -25,14 +25,14 @@ GUI -> Presenter -> BLL -> DAL -> Database
 
 1. Mo solution `PharmacyManagementSystem.slnx`.
 2. Tao database `PharmacyManagementSystemDb` trong SQL Server.
-3. Chay cac script trong folder `SQL_Database/` de tao bang hien co:
+3. Chay cac script trong folder `SQL_Database/`:
    - `User.sql`
    - `Medicines.sql`
 4. Tao file `PharmacyManagementSystem/App.config` tu file mau `PharmacyManagementSystem/App.config.example`.
 5. Sua connection string `PharmacyDb` trong `App.config` cho dung SQL Server tren may dang chay.
 6. Restore NuGet packages neu IDE chua tu dong restore.
 
-`App.config` la cau hinh cuc bo. Khong dua connection string that, ten may noi bo, tai khoan hoac mat khau vao README.
+`App.config` la cau hinh cuc bo. Khong dua connection string that, ten may noi bo, tai khoan hoac mat khau vao repository.
 
 ## Chay Du An
 
@@ -70,8 +70,8 @@ PharmacyManagementSystem/
 `-- PharmacyManagementSystem/
     |-- Program.cs
     |-- App.config.example
-    |-- GUI/            # Windows Forms views
-    |   `-- Controls/   # RoundedButton, RoundedPanel, RoundedTextBox
+    |-- GUI/            # Windows Forms views, dialogs, admin shell
+    |   `-- Controls/   # Custom controls
     |-- Presenters/     # Presenter layer
     |-- BLL/            # Business logic
     |   `-- Validations/
@@ -88,26 +88,28 @@ PharmacyManagementSystem/
 
 ## Chuc Nang Hien Tai
 
-| Chuc nang | Man hinh | Trang thai |
-|-----------|----------|------------|
-| Dang nhap | `LoginForm` | Validate input, verify mat khau PBKDF2, kiem tra active, dieu huong theo role |
-| Dang ky | `RegisterForm` | Validate input, hash mat khau PBKDF2, tao tai khoan role `Staff` |
-| Dashboard Admin | `MainForm` | Thong ke thuoc, ton kho, sap het hang, sap het han, Admin, Staff, user active |
-| Khu vuc Staff | `StaffHomeForm` | Man hinh lam viec co ban cho tai khoan Staff |
-| Dang xuat | `MainForm`, `StaffHomeForm` | Quay lai `LoginForm` de dang nhap tai khoan khac |
-| Database check | `Program.cs`, `DatabaseInitializer` | Kiem tra ket noi database khi khoi dong app |
+| Chuc nang | Trang thai |
+|-----------|------------|
+| Dang nhap/Dang ky | Co validate input, hash mat khau PBKDF2, kiem tra trang thai tai khoan |
+| Phan quyen | Dieu huong `Admin` vao dashboard, `Staff` vao khu vuc lam viec rieng |
+| Dashboard Admin | Hien thong ke tong quan ve thuoc, ton kho va tai khoan |
+| Side Navigation Admin | Dieu huong giua dashboard, quan ly thuoc, quan ly nhan vien va cac muc se phat trien tiep |
+| Quan ly thuoc | Xem danh sach, tim kiem, loc trang thai, them, sua, ngung kinh doanh |
+| Quan ly nhan vien | Xem danh sach, tim kiem, loc vai tro/trang thai, them, sua, khoa/mo khoa tai khoan |
+| Khu vuc Staff | Man hinh lam viec co ban cho nhan vien |
+| Database check | Kiem tra ket noi database khi khoi dong app |
 
 ## Luong Chay
 
 1. App chay tu `Program.cs`.
 2. `DatabaseInitializer` kiem tra ket noi database.
 3. Neu ket noi thanh cong, app mo `LoginForm`.
-4. Nguoi dung co the dang nhap hoac mo `RegisterForm` de dang ky.
+4. Nguoi dung dang nhap hoac mo `RegisterForm` de dang ky.
 5. Tai khoan dang ky moi mac dinh role `Staff`.
 6. Dang nhap thanh cong se dieu huong theo role:
    - `Admin` mo `MainForm`
    - `Staff` mo `StaffHomeForm`
-7. Nut dang xuat tren `MainForm`/`StaffHomeForm` dong man hinh hien tai va hien lai `LoginForm`.
+7. Nut dang xuat dong man hinh hien tai va hien lai `LoginForm`.
 
 ## Database
 
@@ -116,29 +118,32 @@ PharmacyManagementSystem/
 - `DbSet<User>` mapping bang `Users`
 - `DbSet<Medicine>` mapping bang `Medicines`
 
-Project hien chua dung EF Core migration. Schema database duoc tao/cap nhat thu cong bang SQL Server Management Studio va cac script trong `SQL_Database/`.
+Project hien chua dung EF Core migration. Schema database duoc tao/cap nhat thu cong bang SQL script trong `SQL_Database/`.
 
 ## Quy Uoc Chinh
 
 - GUI chi xu ly UI, doc input, bind data va goi Presenter.
 - Presenter dieu phoi giua View va BLL.
 - BLL chua nghiep vu, validation va goi DAL qua interface.
-- DAL chi truy xuat du lieu bang EF/LINQ, khong viet SQL thuan trong C#.
+- DAL truy xuat du lieu bang EF/LINQ.
 - DTO dung de truyen du lieu giua cac tang.
 - Entity dung cho EF Core/database mapping.
-- Role hien tai chi gom `Admin` va `Staff`.
-- Mat khau khong luu plain text; login/register dung PBKDF2.
+- Role hien tai gom `Admin` va `Staff`.
+- Mat khau khong luu plain text; he thong dung PBKDF2.
 
 ## Trang Thai Chua Hoan Thien
 
 - Chua co EF Core migration.
 - Chua co report/RDLC.
-- Chua co Guna UI.
-- Chua implement day du quan ly thuoc, hoa don, khach hang va nhan vien.
-- `MedicineForm.cs`, `ReportForm.cs`, `SearchBarControl.cs` va mot so file Presenter/BLL/DAL/interface lien quan den Medicine/Invoice/Employee/Customer van dang la placeholder rong.
+- Chua co module day du cho hoa don, chi tiet hoa don va khach hang.
+- Quan ly thuoc va nhan vien moi o muc co ban; chua co phan trang, export/import, audit log, phan quyen chi tiet.
 
 ## Ghi Chu
 
-- Xem them quy tac lam viec trong `AGENTS.md`.
-- Neu cap nhat schema khi chua dung migration, can cap nhat dong bo SQL script, Entity, DTO, DAL va BLL lien quan.
+- Xem quy tac lam viec danh cho AI/developer trong `AGENTS.md`.
 - Neu app khong khoi dong duoc, kiem tra `App.config`, database `PharmacyManagementSystemDb` va cac bang `Users`, `Medicines`.
+- Sau khi sua code, nen chay:
+
+```powershell
+dotnet build PharmacyManagementSystem/PharmacyManagementSystem.csproj
+```
