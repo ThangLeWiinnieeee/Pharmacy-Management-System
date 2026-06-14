@@ -83,4 +83,11 @@ public partial class MedicineManagementView : UserControl, IMedicineManagementVi
     {
         MessageBox.Show(this, message, "Quản lý thuốc", MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
+
+    public void EnableReadOnlyMode()
+    {
+        buttonAddMedicine.Visible = false;
+        buttonEditMedicine.Visible = false;
+        buttonDeleteMedicine.Visible = false;
+    }
 }

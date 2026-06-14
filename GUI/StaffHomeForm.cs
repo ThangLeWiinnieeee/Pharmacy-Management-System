@@ -24,6 +24,18 @@ public partial class StaffHomeForm : Form
         Logout();
     }
 
+    private void HandleSearchMedicineClick(object? sender, EventArgs e)
+    {
+        using var form = new MedicineForm();
+        form.ShowDialog(this);
+    }
+
+    private void HandleCreateInvoiceClick(object? sender, EventArgs e)
+    {
+        using var form = new InvoiceEditorForm(_currentUser);
+        form.ShowDialog(this);
+    }
+
     private void Logout()
     {
         DialogResult = DialogResult.Retry;

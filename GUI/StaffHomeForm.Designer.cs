@@ -207,6 +207,7 @@ namespace PharmacyManagementSystem
             buttonSearchMedicineOpen.TabIndex = 3;
             buttonSearchMedicineOpen.Text = "Mở";
             buttonSearchMedicineOpen.UseVisualStyleBackColor = false;
+            buttonSearchMedicineOpen.Click += HandleSearchMedicineClick;
 
             cardCreateInvoice.BackColor = System.Drawing.Color.White;
             cardCreateInvoice.BorderColor = System.Drawing.Color.FromArgb(224, 229, 235);
@@ -258,6 +259,7 @@ namespace PharmacyManagementSystem
             buttonCreateInvoiceOpen.TabIndex = 3;
             buttonCreateInvoiceOpen.Text = "Mở";
             buttonCreateInvoiceOpen.UseVisualStyleBackColor = false;
+            buttonCreateInvoiceOpen.Click += HandleCreateInvoiceClick;
 
             cardInvoiceHistory.BackColor = System.Drawing.Color.White;
             cardInvoiceHistory.BorderColor = System.Drawing.Color.FromArgb(224, 229, 235);
