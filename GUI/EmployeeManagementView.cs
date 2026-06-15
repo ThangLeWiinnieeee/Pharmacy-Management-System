@@ -60,7 +60,20 @@ public partial class EmployeeManagementView : UserControl, IEmployeeManagementVi
                 employee.Role,
                 employee.IsActive ? "Đang hoạt động" : "Đã khóa");
 
-            employeesGrid.Rows[rowIndex].Tag = employee;
+            var row = employeesGrid.Rows[rowIndex];
+            row.Tag = employee;
+
+            var statusCell = row.Cells["columnStatus"];
+            statusCell.Style.ForeColor = employee.IsActive
+                ? Color.FromArgb(25, 135, 84)
+                : Color.FromArgb(220, 53, 69);
+            statusCell.Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+
+            if (employee.Role == "Admin")
+            {
+                row.Cells["columnRole"].Style.ForeColor = Color.FromArgb(13, 110, 253);
+                row.Cells["columnRole"].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            }
         }
 
         UpdateLockButtonText();

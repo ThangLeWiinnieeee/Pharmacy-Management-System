@@ -11,10 +11,7 @@ namespace PharmacyManagementSystem
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
-
             base.Dispose(disposing);
         }
 
@@ -33,72 +30,40 @@ namespace PharmacyManagementSystem
             columnSellPrice = new DataGridViewTextBoxColumn();
             columnExpiryDate = new DataGridViewTextBoxColumn();
             columnStatus = new DataGridViewTextBoxColumn();
+            panelGap = new Panel();
             panelToolbar = new RoundedPanel();
             buttonLookupDetail = new RoundedButton();
             buttonDeleteMedicine = new RoundedButton();
             buttonEditMedicine = new RoundedButton();
             buttonAddMedicine = new RoundedButton();
             comboStatusFilter = new ComboBox();
-            labelStatusFilter = new Label();
             textSearchMedicine = new RoundedTextBox();
-            labelSearchMedicine = new Label();
-            panelIntro = new RoundedPanel();
-            labelIntroTitle = new Label();
-            labelIntroDescription = new Label();
             panelRoot.SuspendLayout();
             panelTable.SuspendLayout();
             ((ISupportInitialize)medicinesGrid).BeginInit();
             panelToolbar.SuspendLayout();
-            panelIntro.SuspendLayout();
             SuspendLayout();
 
+            // UserControl
             BackColor = Color.FromArgb(248, 249, 250);
             Controls.Add(panelRoot);
             Dock = DockStyle.Fill;
             Name = "MedicineManagementView";
             Size = new Size(876, 610);
 
+            // panelRoot — outer padding gives breathing room around content
             panelRoot.BackColor = Color.FromArgb(248, 249, 250);
+            panelRoot.Padding = new Padding(16);
             panelRoot.Controls.Add(panelTable);
+            panelRoot.Controls.Add(panelGap);
             panelRoot.Controls.Add(panelToolbar);
-            panelRoot.Controls.Add(panelIntro);
             panelRoot.Dock = DockStyle.Fill;
             panelRoot.Location = new Point(0, 0);
             panelRoot.Name = "panelRoot";
             panelRoot.Size = new Size(876, 610);
             panelRoot.TabIndex = 0;
 
-            panelIntro.BackColor = Color.White;
-            panelIntro.BorderColor = Color.FromArgb(224, 229, 235);
-            panelIntro.BorderRadius = 18;
-            panelIntro.BorderSize = 1;
-            panelIntro.Controls.Add(labelIntroTitle);
-            panelIntro.Controls.Add(labelIntroDescription);
-            panelIntro.Dock = DockStyle.Top;
-            panelIntro.Location = new Point(0, 0);
-            panelIntro.Margin = new Padding(0, 0, 0, 18);
-            panelIntro.Name = "panelIntro";
-            panelIntro.Size = new Size(876, 108);
-            panelIntro.TabIndex = 0;
-
-            labelIntroTitle.AutoSize = true;
-            labelIntroTitle.Font = new Font("Segoe UI", 17F, FontStyle.Bold, GraphicsUnit.Point);
-            labelIntroTitle.ForeColor = Color.FromArgb(51, 51, 51);
-            labelIntroTitle.Location = new Point(28, 22);
-            labelIntroTitle.Name = "labelIntroTitle";
-            labelIntroTitle.Size = new Size(165, 31);
-            labelIntroTitle.TabIndex = 0;
-            labelIntroTitle.Text = "Quản lý thuốc";
-
-            labelIntroDescription.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            labelIntroDescription.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            labelIntroDescription.ForeColor = Color.FromArgb(102, 102, 102);
-            labelIntroDescription.Location = new Point(31, 62);
-            labelIntroDescription.Name = "labelIntroDescription";
-            labelIntroDescription.Size = new Size(812, 24);
-            labelIntroDescription.TabIndex = 1;
-            labelIntroDescription.Text = "Theo dõi danh mục thuốc, tồn kho, giá bán và trạng thái kinh doanh.";
-
+            // panelToolbar — single-row compact layout (68px)
             panelToolbar.BackColor = Color.White;
             panelToolbar.BorderColor = Color.FromArgb(224, 229, 235);
             panelToolbar.BorderRadius = 16;
@@ -108,135 +73,121 @@ namespace PharmacyManagementSystem
             panelToolbar.Controls.Add(buttonEditMedicine);
             panelToolbar.Controls.Add(buttonAddMedicine);
             panelToolbar.Controls.Add(comboStatusFilter);
-            panelToolbar.Controls.Add(labelStatusFilter);
             panelToolbar.Controls.Add(textSearchMedicine);
-            panelToolbar.Controls.Add(labelSearchMedicine);
             panelToolbar.Dock = DockStyle.Top;
-            panelToolbar.Location = new Point(0, 108);
-            panelToolbar.Margin = new Padding(0, 18, 0, 18);
             panelToolbar.Name = "panelToolbar";
-            panelToolbar.Size = new Size(876, 96);
-            panelToolbar.TabIndex = 1;
+            panelToolbar.Size = new Size(844, 68);
+            panelToolbar.TabIndex = 0;
 
-            labelSearchMedicine.AutoSize = true;
-            labelSearchMedicine.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
-            labelSearchMedicine.ForeColor = Color.FromArgb(51, 51, 51);
-            labelSearchMedicine.Location = new Point(24, 18);
-            labelSearchMedicine.Name = "labelSearchMedicine";
-            labelSearchMedicine.Size = new Size(64, 17);
-            labelSearchMedicine.TabIndex = 0;
-            labelSearchMedicine.Text = "Tìm kiếm";
-
+            // textSearchMedicine — vertically centered in 68px toolbar
             textSearchMedicine.BackColor = Color.White;
-            textSearchMedicine.BorderColor = Color.FromArgb(170, 183, 196);
+            textSearchMedicine.BorderColor = Color.FromArgb(180, 190, 200);
             textSearchMedicine.BorderRadius = 10;
             textSearchMedicine.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             textSearchMedicine.ForeColor = Color.FromArgb(51, 51, 51);
-            textSearchMedicine.Location = new Point(24, 42);
+            textSearchMedicine.Location = new Point(20, 15);
             textSearchMedicine.Name = "textSearchMedicine";
-            textSearchMedicine.PlaceholderText = "Mã thuốc, tên thuốc...";
-            textSearchMedicine.Size = new Size(280, 38);
-            textSearchMedicine.TabIndex = 1;
+            textSearchMedicine.PlaceholderText = "Tìm kiếm mã thuốc, tên thuốc...";
+            textSearchMedicine.Size = new Size(240, 38);
+            textSearchMedicine.TabIndex = 0;
 
-            labelStatusFilter.AutoSize = true;
-            labelStatusFilter.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
-            labelStatusFilter.ForeColor = Color.FromArgb(51, 51, 51);
-            labelStatusFilter.Location = new Point(326, 18);
-            labelStatusFilter.Name = "labelStatusFilter";
-            labelStatusFilter.Size = new Size(70, 17);
-            labelStatusFilter.TabIndex = 2;
-            labelStatusFilter.Text = "Trạng thái";
-
+            // comboStatusFilter
             comboStatusFilter.DropDownStyle = ComboBoxStyle.DropDownList;
             comboStatusFilter.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             comboStatusFilter.FormattingEnabled = true;
             comboStatusFilter.Items.AddRange(new object[] { "Tất cả", "Đang kinh doanh", "Ngừng bán", "Sắp hết hàng", "Sắp hết hạn" });
-            comboStatusFilter.Location = new Point(326, 47);
+            comboStatusFilter.Location = new Point(272, 19);
             comboStatusFilter.Name = "comboStatusFilter";
             comboStatusFilter.Size = new Size(150, 25);
-            comboStatusFilter.TabIndex = 3;
+            comboStatusFilter.TabIndex = 1;
 
+            // buttonLookupDetail — info blue
+            buttonLookupDetail.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonLookupDetail.BackColor = Color.FromArgb(13, 110, 253);
+            buttonLookupDetail.BorderRadius = 12;
+            buttonLookupDetail.BorderSize = 0;
+            buttonLookupDetail.FlatAppearance.BorderSize = 0;
+            buttonLookupDetail.FlatStyle = FlatStyle.Flat;
+            buttonLookupDetail.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonLookupDetail.ForeColor = Color.White;
+            buttonLookupDetail.HoverBackColor = Color.FromArgb(0, 100, 235);
+            buttonLookupDetail.Location = new Point(440, 15);
+            buttonLookupDetail.Name = "buttonLookupDetail";
+            buttonLookupDetail.Size = new Size(108, 38);
+            buttonLookupDetail.TabIndex = 2;
+            buttonLookupDetail.Text = "Xem lô";
+            buttonLookupDetail.UseVisualStyleBackColor = false;
+
+            // buttonAddMedicine — success green
             buttonAddMedicine.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonAddMedicine.BackColor = Color.FromArgb(0, 123, 255);
+            buttonAddMedicine.BackColor = Color.FromArgb(25, 135, 84);
             buttonAddMedicine.BorderRadius = 12;
             buttonAddMedicine.BorderSize = 0;
             buttonAddMedicine.FlatAppearance.BorderSize = 0;
             buttonAddMedicine.FlatStyle = FlatStyle.Flat;
-            buttonAddMedicine.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonAddMedicine.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonAddMedicine.ForeColor = Color.White;
-            buttonAddMedicine.HoverBackColor = Color.FromArgb(0, 113, 235);
-            buttonAddMedicine.Location = new Point(540, 42);
+            buttonAddMedicine.HoverBackColor = Color.FromArgb(20, 115, 72);
+            buttonAddMedicine.Location = new Point(556, 15);
             buttonAddMedicine.Name = "buttonAddMedicine";
-            buttonAddMedicine.Size = new Size(84, 38);
-            buttonAddMedicine.TabIndex = 4;
+            buttonAddMedicine.Size = new Size(90, 38);
+            buttonAddMedicine.TabIndex = 3;
             buttonAddMedicine.Text = "Thêm";
             buttonAddMedicine.UseVisualStyleBackColor = false;
 
+            // buttonEditMedicine — warning amber
             buttonEditMedicine.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonEditMedicine.BackColor = Color.FromArgb(40, 167, 69);
+            buttonEditMedicine.BackColor = Color.FromArgb(255, 153, 0);
             buttonEditMedicine.BorderRadius = 12;
             buttonEditMedicine.BorderSize = 0;
             buttonEditMedicine.FlatAppearance.BorderSize = 0;
             buttonEditMedicine.FlatStyle = FlatStyle.Flat;
-            buttonEditMedicine.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonEditMedicine.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonEditMedicine.ForeColor = Color.White;
-            buttonEditMedicine.HoverBackColor = Color.FromArgb(37, 154, 64);
-            buttonEditMedicine.Location = new Point(650, 42);
+            buttonEditMedicine.HoverBackColor = Color.FromArgb(230, 138, 0);
+            buttonEditMedicine.Location = new Point(654, 15);
             buttonEditMedicine.Name = "buttonEditMedicine";
             buttonEditMedicine.Size = new Size(80, 38);
-            buttonEditMedicine.TabIndex = 5;
+            buttonEditMedicine.TabIndex = 4;
             buttonEditMedicine.Text = "Sửa";
             buttonEditMedicine.UseVisualStyleBackColor = false;
 
+            // buttonDeleteMedicine — danger red
             buttonDeleteMedicine.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             buttonDeleteMedicine.BackColor = Color.FromArgb(220, 53, 69);
             buttonDeleteMedicine.BorderRadius = 12;
             buttonDeleteMedicine.BorderSize = 0;
             buttonDeleteMedicine.FlatAppearance.BorderSize = 0;
             buttonDeleteMedicine.FlatStyle = FlatStyle.Flat;
-            buttonDeleteMedicine.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonDeleteMedicine.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonDeleteMedicine.ForeColor = Color.White;
             buttonDeleteMedicine.HoverBackColor = Color.FromArgb(201, 48, 62);
-            buttonDeleteMedicine.Location = new Point(750, 42);
+            buttonDeleteMedicine.Location = new Point(742, 15);
             buttonDeleteMedicine.Name = "buttonDeleteMedicine";
-            buttonDeleteMedicine.Size = new Size(80, 38);
-            buttonDeleteMedicine.TabIndex = 6;
+            buttonDeleteMedicine.Size = new Size(82, 38);
+            buttonDeleteMedicine.TabIndex = 5;
             buttonDeleteMedicine.Text = "Xóa";
             buttonDeleteMedicine.UseVisualStyleBackColor = false;
 
-            buttonLookupDetail.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonLookupDetail.BackColor = Color.FromArgb(0, 123, 180);
-            buttonLookupDetail.BorderRadius = 12;
-            buttonLookupDetail.BorderSize = 0;
-            buttonLookupDetail.FlatAppearance.BorderSize = 0;
-            buttonLookupDetail.FlatStyle = FlatStyle.Flat;
-            buttonLookupDetail.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonLookupDetail.ForeColor = Color.White;
-            buttonLookupDetail.HoverBackColor = Color.FromArgb(0, 100, 155);
-            buttonLookupDetail.Location = new Point(488, 42);
-            buttonLookupDetail.Name = "buttonLookupDetail";
-            buttonLookupDetail.Size = new Size(110, 38);
-            buttonLookupDetail.TabIndex = 9;
-            buttonLookupDetail.Text = "Xem lô";
-            buttonLookupDetail.UseVisualStyleBackColor = false;
+            // panelGap — spacer between toolbar and table
+            panelGap.BackColor = Color.FromArgb(248, 249, 250);
+            panelGap.Dock = DockStyle.Top;
+            panelGap.Height = 10;
+            panelGap.Name = "panelGap";
+            panelGap.TabIndex = 1;
 
-            // Căn nút action sát phải panel (876px)
-            buttonAddMedicine.Location    = new Point(606, 42);
-            buttonEditMedicine.Location   = new Point(698, 42);
-            buttonDeleteMedicine.Location = new Point(786, 42);
-
+            // panelTable
             panelTable.BackColor = Color.White;
             panelTable.BorderColor = Color.FromArgb(224, 229, 235);
             panelTable.BorderRadius = 16;
             panelTable.BorderSize = 1;
             panelTable.Controls.Add(medicinesGrid);
             panelTable.Dock = DockStyle.Fill;
-            panelTable.Location = new Point(0, 204);
             panelTable.Name = "panelTable";
-            panelTable.Padding = new Padding(16);
-            panelTable.Size = new Size(876, 406);
+            panelTable.Padding = new Padding(1);
             panelTable.TabIndex = 2;
 
+            // medicinesGrid
             medicinesGrid.AllowUserToAddRows = false;
             medicinesGrid.AllowUserToDeleteRows = false;
             medicinesGrid.AllowUserToResizeColumns = false;
@@ -244,7 +195,9 @@ namespace PharmacyManagementSystem
             medicinesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             medicinesGrid.BackgroundColor = Color.White;
             medicinesGrid.BorderStyle = BorderStyle.None;
-            medicinesGrid.ColumnHeadersHeight = 42;
+            medicinesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            medicinesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            medicinesGrid.ColumnHeadersHeight = 44;
             medicinesGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             medicinesGrid.Columns.AddRange(new DataGridViewColumn[] { columnCode, columnName, columnUnit, columnQuantity, columnSellPrice, columnExpiryDate, columnStatus });
             foreach (DataGridViewColumn col in medicinesGrid.Columns)
@@ -252,64 +205,94 @@ namespace PharmacyManagementSystem
             medicinesGrid.Dock = DockStyle.Fill;
             medicinesGrid.EnableHeadersVisualStyles = false;
             medicinesGrid.GridColor = Color.FromArgb(233, 236, 239);
-            medicinesGrid.Location = new Point(16, 16);
             medicinesGrid.MultiSelect = false;
             medicinesGrid.Name = "medicinesGrid";
             medicinesGrid.ReadOnly = true;
             medicinesGrid.RowHeadersVisible = false;
-            medicinesGrid.RowTemplate.Height = 40;
+            medicinesGrid.RowTemplate.Height = 42;
             medicinesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            medicinesGrid.Size = new Size(844, 374);
             medicinesGrid.TabIndex = 0;
 
+            // Header style
+            medicinesGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
+            medicinesGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(73, 80, 87);
+            medicinesGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            medicinesGrid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(248, 249, 250);
+            medicinesGrid.ColumnHeadersDefaultCellStyle.Padding = new Padding(10, 0, 0, 0);
+            // Cell style
+            medicinesGrid.DefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
+            medicinesGrid.DefaultCellStyle.ForeColor = Color.FromArgb(51, 51, 51);
+            medicinesGrid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(219, 234, 254);
+            medicinesGrid.DefaultCellStyle.SelectionForeColor = Color.FromArgb(33, 37, 41);
+            medicinesGrid.DefaultCellStyle.Padding = new Padding(10, 0, 0, 0);
+            medicinesGrid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 252, 255);
+
+            // columnCode
             columnCode.HeaderText = "Mã thuốc";
             columnCode.Name = "columnCode";
             columnCode.ReadOnly = true;
+            columnCode.FillWeight = 90;
 
+            // columnName
             columnName.HeaderText = "Tên thuốc";
             columnName.Name = "columnName";
             columnName.ReadOnly = true;
+            columnName.FillWeight = 215;
 
+            // columnUnit
             columnUnit.HeaderText = "Đơn vị";
             columnUnit.Name = "columnUnit";
             columnUnit.ReadOnly = true;
+            columnUnit.FillWeight = 68;
+            columnUnit.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            columnUnit.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
+            // columnQuantity — right-aligned
             columnQuantity.HeaderText = "Tồn kho";
             columnQuantity.Name = "columnQuantity";
             columnQuantity.ReadOnly = true;
+            columnQuantity.FillWeight = 85;
+            columnQuantity.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            columnQuantity.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+            columnQuantity.DefaultCellStyle.Padding = new Padding(0, 0, 14, 0);
+            columnQuantity.HeaderCell.Style.Padding = new Padding(0, 0, 14, 0);
 
+            // columnSellPrice — right-aligned
             columnSellPrice.HeaderText = "Giá bán";
             columnSellPrice.Name = "columnSellPrice";
             columnSellPrice.ReadOnly = true;
+            columnSellPrice.FillWeight = 105;
+            columnSellPrice.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            columnSellPrice.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+            columnSellPrice.DefaultCellStyle.Padding = new Padding(0, 0, 14, 0);
+            columnSellPrice.HeaderCell.Style.Padding = new Padding(0, 0, 14, 0);
 
+            // columnExpiryDate
             columnExpiryDate.HeaderText = "Hạn dùng";
             columnExpiryDate.Name = "columnExpiryDate";
             columnExpiryDate.ReadOnly = true;
+            columnExpiryDate.FillWeight = 95;
 
+            // columnStatus
             columnStatus.HeaderText = "Trạng thái";
             columnStatus.Name = "columnStatus";
             columnStatus.ReadOnly = true;
+            columnStatus.FillWeight = 100;
 
             panelRoot.ResumeLayout(false);
             panelTable.ResumeLayout(false);
             ((ISupportInitialize)medicinesGrid).EndInit();
             panelToolbar.ResumeLayout(false);
             panelToolbar.PerformLayout();
-            panelIntro.ResumeLayout(false);
-            panelIntro.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
 
         private Panel panelRoot;
-        private RoundedPanel panelIntro;
-        private Label labelIntroTitle;
-        private Label labelIntroDescription;
+        private Panel panelGap;
         private RoundedPanel panelToolbar;
-        private Label labelSearchMedicine;
         private RoundedTextBox textSearchMedicine;
-        private Label labelStatusFilter;
         private ComboBox comboStatusFilter;
         private RoundedButton buttonAddMedicine;
         private RoundedButton buttonEditMedicine;

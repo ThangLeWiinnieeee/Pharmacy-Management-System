@@ -52,10 +52,6 @@ public partial class MainForm : Form, IDashboardView
         sideNavigationMenu.EmployeeRequested += (_, _) => ShowEmployeePage();
         sideNavigationMenu.InvoiceRequested += (_, _) => ShowInvoiceHistoryPage();
         sideNavigationMenu.CustomerRequested += (_, _) => ShowCustomerPage();
-        sideNavigationMenu.ReportRequested += (_, _) => ShowPlaceholderPage(
-            SideNavigationMenuItem.Report,
-            "Báo cáo",
-            "Khu vực tổng hợp báo cáo doanh thu, tồn kho và hiệu quả vận hành.");
         sideNavigationMenu.LogoutRequested += (_, _) => Logout();
     }
 

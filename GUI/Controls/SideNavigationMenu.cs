@@ -6,8 +6,7 @@ public enum SideNavigationMenuItem
     Medicine,
     Employee,
     Invoice,
-    Customer,
-    Report
+    Customer
 }
 
 public class SideNavigationMenu : UserControl
@@ -26,7 +25,6 @@ public class SideNavigationMenu : UserControl
     private readonly RoundedButton _employeeButton;
     private readonly RoundedButton _invoiceButton;
     private readonly RoundedButton _customerButton;
-    private readonly RoundedButton _reportButton;
     private readonly RoundedButton _logoutButton;
     private readonly Dictionary<SideNavigationMenuItem, RoundedButton> _navigationButtons;
 
@@ -75,7 +73,6 @@ public class SideNavigationMenu : UserControl
         _employeeButton = CreateNavigationButton("Quản lý nhân viên", new Point(18, 238), 5, SideNavigationMenuItem.Employee);
         _invoiceButton = CreateNavigationButton("Lịch sử bán hàng", new Point(18, 290), 6, SideNavigationMenuItem.Invoice);
         _customerButton = CreateNavigationButton("Khách hàng", new Point(18, 342), 7, SideNavigationMenuItem.Customer);
-        _reportButton = CreateNavigationButton("Báo cáo", new Point(18, 394), 8, SideNavigationMenuItem.Report);
 
         _logoutButton = new RoundedButton
         {
@@ -132,7 +129,6 @@ public class SideNavigationMenu : UserControl
         footerPanel.Controls.Add(_logoutButton);
 
         Controls.Add(footerPanel);
-        Controls.Add(_reportButton);
         Controls.Add(_customerButton);
         Controls.Add(_invoiceButton);
         Controls.Add(_employeeButton);
@@ -148,8 +144,7 @@ public class SideNavigationMenu : UserControl
             [SideNavigationMenuItem.Medicine] = _medicineButton,
             [SideNavigationMenuItem.Employee] = _employeeButton,
             [SideNavigationMenuItem.Invoice] = _invoiceButton,
-            [SideNavigationMenuItem.Customer] = _customerButton,
-            [SideNavigationMenuItem.Report] = _reportButton
+            [SideNavigationMenuItem.Customer] = _customerButton
         };
 
         foreach (var button in _navigationButtons.Values)
@@ -169,8 +164,6 @@ public class SideNavigationMenu : UserControl
     public event EventHandler? InvoiceRequested;
 
     public event EventHandler? CustomerRequested;
-
-    public event EventHandler? ReportRequested;
 
     public event EventHandler? LogoutRequested;
 
@@ -232,9 +225,6 @@ public class SideNavigationMenu : UserControl
                 break;
             case SideNavigationMenuItem.Customer:
                 CustomerRequested?.Invoke(this, EventArgs.Empty);
-                break;
-            case SideNavigationMenuItem.Report:
-                ReportRequested?.Invoke(this, EventArgs.Empty);
                 break;
         }
     }

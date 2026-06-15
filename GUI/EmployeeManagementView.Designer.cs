@@ -11,10 +11,7 @@ namespace PharmacyManagementSystem
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
-
             base.Dispose(disposing);
         }
 
@@ -32,72 +29,40 @@ namespace PharmacyManagementSystem
             columnPhone = new DataGridViewTextBoxColumn();
             columnRole = new DataGridViewTextBoxColumn();
             columnStatus = new DataGridViewTextBoxColumn();
+            panelGap = new Panel();
             panelToolbar = new RoundedPanel();
             buttonLockEmployee = new RoundedButton();
             buttonEditEmployee = new RoundedButton();
             buttonAddEmployee = new RoundedButton();
             comboRoleFilter = new ComboBox();
-            labelRoleFilter = new Label();
             comboStatusFilter = new ComboBox();
-            labelStatusFilter = new Label();
             textSearchEmployee = new RoundedTextBox();
-            labelSearchEmployee = new Label();
-            panelIntro = new RoundedPanel();
-            labelIntroTitle = new Label();
-            labelIntroDescription = new Label();
             panelRoot.SuspendLayout();
             panelTable.SuspendLayout();
             ((ISupportInitialize)employeesGrid).BeginInit();
             panelToolbar.SuspendLayout();
-            panelIntro.SuspendLayout();
             SuspendLayout();
 
+            // UserControl
             BackColor = Color.FromArgb(248, 249, 250);
             Controls.Add(panelRoot);
             Dock = DockStyle.Fill;
             Name = "EmployeeManagementView";
             Size = new Size(876, 610);
 
+            // panelRoot — outer padding gives breathing room
             panelRoot.BackColor = Color.FromArgb(248, 249, 250);
+            panelRoot.Padding = new Padding(16);
             panelRoot.Controls.Add(panelTable);
+            panelRoot.Controls.Add(panelGap);
             panelRoot.Controls.Add(panelToolbar);
-            panelRoot.Controls.Add(panelIntro);
             panelRoot.Dock = DockStyle.Fill;
             panelRoot.Location = new Point(0, 0);
             panelRoot.Name = "panelRoot";
             panelRoot.Size = new Size(876, 610);
             panelRoot.TabIndex = 0;
 
-            panelIntro.BackColor = Color.White;
-            panelIntro.BorderColor = Color.FromArgb(224, 229, 235);
-            panelIntro.BorderRadius = 18;
-            panelIntro.BorderSize = 1;
-            panelIntro.Controls.Add(labelIntroTitle);
-            panelIntro.Controls.Add(labelIntroDescription);
-            panelIntro.Dock = DockStyle.Top;
-            panelIntro.Location = new Point(0, 0);
-            panelIntro.Name = "panelIntro";
-            panelIntro.Size = new Size(876, 108);
-            panelIntro.TabIndex = 0;
-
-            labelIntroTitle.AutoSize = true;
-            labelIntroTitle.Font = new Font("Segoe UI", 17F, FontStyle.Bold, GraphicsUnit.Point);
-            labelIntroTitle.ForeColor = Color.FromArgb(51, 51, 51);
-            labelIntroTitle.Location = new Point(28, 22);
-            labelIntroTitle.Name = "labelIntroTitle";
-            labelIntroTitle.Size = new Size(221, 31);
-            labelIntroTitle.TabIndex = 0;
-            labelIntroTitle.Text = "Quản lý nhân viên";
-
-            labelIntroDescription.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            labelIntroDescription.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            labelIntroDescription.ForeColor = Color.FromArgb(102, 102, 102);
-            labelIntroDescription.Location = new Point(31, 62);
-            labelIntroDescription.Name = "labelIntroDescription";
-            labelIntroDescription.Size = new Size(812, 24);
-            labelIntroDescription.TabIndex = 1;
-            labelIntroDescription.Text = "Quản lý tài khoản, phân quyền và trạng thái hoạt động của nhân viên.";
-
+            // panelToolbar — single-row compact layout (68px)
             panelToolbar.BackColor = Color.White;
             panelToolbar.BorderColor = Color.FromArgb(224, 229, 235);
             panelToolbar.BorderRadius = 16;
@@ -106,133 +71,115 @@ namespace PharmacyManagementSystem
             panelToolbar.Controls.Add(buttonEditEmployee);
             panelToolbar.Controls.Add(buttonAddEmployee);
             panelToolbar.Controls.Add(comboRoleFilter);
-            panelToolbar.Controls.Add(labelRoleFilter);
             panelToolbar.Controls.Add(comboStatusFilter);
-            panelToolbar.Controls.Add(labelStatusFilter);
             panelToolbar.Controls.Add(textSearchEmployee);
-            panelToolbar.Controls.Add(labelSearchEmployee);
             panelToolbar.Dock = DockStyle.Top;
-            panelToolbar.Location = new Point(0, 108);
             panelToolbar.Name = "panelToolbar";
-            panelToolbar.Size = new Size(876, 112);
-            panelToolbar.TabIndex = 1;
+            panelToolbar.Size = new Size(844, 68);
+            panelToolbar.TabIndex = 0;
 
-            labelSearchEmployee.AutoSize = true;
-            labelSearchEmployee.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
-            labelSearchEmployee.ForeColor = Color.FromArgb(51, 51, 51);
-            labelSearchEmployee.Location = new Point(24, 18);
-            labelSearchEmployee.Name = "labelSearchEmployee";
-            labelSearchEmployee.Size = new Size(64, 17);
-            labelSearchEmployee.TabIndex = 0;
-            labelSearchEmployee.Text = "Tìm kiếm";
-
+            // textSearchEmployee — vertically centered in 68px toolbar
             textSearchEmployee.BackColor = Color.White;
-            textSearchEmployee.BorderColor = Color.FromArgb(170, 183, 196);
+            textSearchEmployee.BorderColor = Color.FromArgb(180, 190, 200);
             textSearchEmployee.BorderRadius = 10;
             textSearchEmployee.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             textSearchEmployee.ForeColor = Color.FromArgb(51, 51, 51);
-            textSearchEmployee.Location = new Point(24, 42);
+            textSearchEmployee.Location = new Point(20, 15);
             textSearchEmployee.Name = "textSearchEmployee";
-            textSearchEmployee.PlaceholderText = "Tên nhân viên, username...";
-            textSearchEmployee.Size = new Size(250, 38);
-            textSearchEmployee.TabIndex = 1;
+            textSearchEmployee.PlaceholderText = "Tìm kiếm tên, tài khoản...";
+            textSearchEmployee.Size = new Size(230, 38);
+            textSearchEmployee.TabIndex = 0;
 
-            labelStatusFilter.AutoSize = true;
-            labelStatusFilter.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
-            labelStatusFilter.ForeColor = Color.FromArgb(51, 51, 51);
-            labelStatusFilter.Location = new Point(292, 18);
-            labelStatusFilter.Name = "labelStatusFilter";
-            labelStatusFilter.Size = new Size(70, 17);
-            labelStatusFilter.TabIndex = 2;
-            labelStatusFilter.Text = "Trạng thái";
-
+            // comboStatusFilter
             comboStatusFilter.DropDownStyle = ComboBoxStyle.DropDownList;
             comboStatusFilter.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             comboStatusFilter.FormattingEnabled = true;
             comboStatusFilter.Items.AddRange(new object[] { "Tất cả", "Đang hoạt động", "Đã khóa" });
-            comboStatusFilter.Location = new Point(292, 47);
+            comboStatusFilter.Location = new Point(262, 19);
             comboStatusFilter.Name = "comboStatusFilter";
-            comboStatusFilter.Size = new Size(150, 25);
-            comboStatusFilter.TabIndex = 3;
+            comboStatusFilter.Size = new Size(148, 25);
+            comboStatusFilter.TabIndex = 1;
 
-            labelRoleFilter.AutoSize = true;
-            labelRoleFilter.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
-            labelRoleFilter.ForeColor = Color.FromArgb(51, 51, 51);
-            labelRoleFilter.Location = new Point(460, 18);
-            labelRoleFilter.Name = "labelRoleFilter";
-            labelRoleFilter.Size = new Size(44, 17);
-            labelRoleFilter.TabIndex = 4;
-            labelRoleFilter.Text = "Vai trò";
-
+            // comboRoleFilter
             comboRoleFilter.DropDownStyle = ComboBoxStyle.DropDownList;
             comboRoleFilter.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             comboRoleFilter.FormattingEnabled = true;
             comboRoleFilter.Items.AddRange(new object[] { "Tất cả", "Admin", "Staff" });
-            comboRoleFilter.Location = new Point(460, 47);
+            comboRoleFilter.Location = new Point(422, 19);
             comboRoleFilter.Name = "comboRoleFilter";
-            comboRoleFilter.Size = new Size(130, 25);
-            comboRoleFilter.TabIndex = 5;
+            comboRoleFilter.Size = new Size(120, 25);
+            comboRoleFilter.TabIndex = 2;
 
+            // buttonAddEmployee — success green
             buttonAddEmployee.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonAddEmployee.BackColor = Color.FromArgb(0, 123, 255);
+            buttonAddEmployee.BackColor = Color.FromArgb(25, 135, 84);
             buttonAddEmployee.BorderRadius = 12;
             buttonAddEmployee.BorderSize = 0;
             buttonAddEmployee.FlatAppearance.BorderSize = 0;
             buttonAddEmployee.FlatStyle = FlatStyle.Flat;
-            buttonAddEmployee.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonAddEmployee.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonAddEmployee.ForeColor = Color.White;
-            buttonAddEmployee.HoverBackColor = Color.FromArgb(0, 113, 235);
-            buttonAddEmployee.Location = new Point(612, 42);
+            buttonAddEmployee.HoverBackColor = Color.FromArgb(20, 115, 72);
+            buttonAddEmployee.Location = new Point(550, 15);
             buttonAddEmployee.Name = "buttonAddEmployee";
-            buttonAddEmployee.Size = new Size(92, 38);
-            buttonAddEmployee.TabIndex = 6;
+            buttonAddEmployee.Size = new Size(90, 38);
+            buttonAddEmployee.TabIndex = 3;
             buttonAddEmployee.Text = "Thêm";
             buttonAddEmployee.UseVisualStyleBackColor = false;
 
+            // buttonEditEmployee — warning amber
             buttonEditEmployee.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonEditEmployee.BackColor = Color.FromArgb(40, 167, 69);
+            buttonEditEmployee.BackColor = Color.FromArgb(255, 153, 0);
             buttonEditEmployee.BorderRadius = 12;
             buttonEditEmployee.BorderSize = 0;
             buttonEditEmployee.FlatAppearance.BorderSize = 0;
             buttonEditEmployee.FlatStyle = FlatStyle.Flat;
-            buttonEditEmployee.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonEditEmployee.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonEditEmployee.ForeColor = Color.White;
-            buttonEditEmployee.HoverBackColor = Color.FromArgb(37, 154, 64);
-            buttonEditEmployee.Location = new Point(714, 42);
+            buttonEditEmployee.HoverBackColor = Color.FromArgb(230, 138, 0);
+            buttonEditEmployee.Location = new Point(648, 15);
             buttonEditEmployee.Name = "buttonEditEmployee";
-            buttonEditEmployee.Size = new Size(72, 38);
-            buttonEditEmployee.TabIndex = 7;
+            buttonEditEmployee.Size = new Size(80, 38);
+            buttonEditEmployee.TabIndex = 4;
             buttonEditEmployee.Text = "Sửa";
             buttonEditEmployee.UseVisualStyleBackColor = false;
 
+            // buttonLockEmployee — danger red; text toggles "Khóa"/"Mở" at runtime
             buttonLockEmployee.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             buttonLockEmployee.BackColor = Color.FromArgb(220, 53, 69);
             buttonLockEmployee.BorderRadius = 12;
             buttonLockEmployee.BorderSize = 0;
             buttonLockEmployee.FlatAppearance.BorderSize = 0;
             buttonLockEmployee.FlatStyle = FlatStyle.Flat;
-            buttonLockEmployee.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonLockEmployee.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             buttonLockEmployee.ForeColor = Color.White;
             buttonLockEmployee.HoverBackColor = Color.FromArgb(201, 48, 62);
-            buttonLockEmployee.Location = new Point(796, 42);
+            buttonLockEmployee.Location = new Point(736, 15);
             buttonLockEmployee.Name = "buttonLockEmployee";
-            buttonLockEmployee.Size = new Size(56, 38);
-            buttonLockEmployee.TabIndex = 8;
+            buttonLockEmployee.Size = new Size(88, 38);
+            buttonLockEmployee.TabIndex = 5;
             buttonLockEmployee.Text = "Khóa";
             buttonLockEmployee.UseVisualStyleBackColor = false;
 
+            // panelGap — spacer between toolbar and table
+            panelGap.BackColor = Color.FromArgb(248, 249, 250);
+            panelGap.Dock = DockStyle.Top;
+            panelGap.Height = 10;
+            panelGap.Name = "panelGap";
+            panelGap.TabIndex = 1;
+
+            // panelTable
             panelTable.BackColor = Color.White;
             panelTable.BorderColor = Color.FromArgb(224, 229, 235);
             panelTable.BorderRadius = 16;
             panelTable.BorderSize = 1;
             panelTable.Controls.Add(employeesGrid);
             panelTable.Dock = DockStyle.Fill;
-            panelTable.Location = new Point(0, 220);
             panelTable.Name = "panelTable";
-            panelTable.Padding = new Padding(16);
-            panelTable.Size = new Size(876, 390);
+            panelTable.Padding = new Padding(1);
             panelTable.TabIndex = 2;
 
+            // employeesGrid
             employeesGrid.AllowUserToAddRows = false;
             employeesGrid.AllowUserToDeleteRows = false;
             employeesGrid.AllowUserToResizeColumns = false;
@@ -240,7 +187,9 @@ namespace PharmacyManagementSystem
             employeesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             employeesGrid.BackgroundColor = Color.White;
             employeesGrid.BorderStyle = BorderStyle.None;
-            employeesGrid.ColumnHeadersHeight = 42;
+            employeesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            employeesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            employeesGrid.ColumnHeadersHeight = 44;
             employeesGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             employeesGrid.Columns.AddRange(new DataGridViewColumn[] { columnUsername, columnFullName, columnEmail, columnPhone, columnRole, columnStatus });
             foreach (DataGridViewColumn col in employeesGrid.Columns)
@@ -248,62 +197,81 @@ namespace PharmacyManagementSystem
             employeesGrid.Dock = DockStyle.Fill;
             employeesGrid.EnableHeadersVisualStyles = false;
             employeesGrid.GridColor = Color.FromArgb(233, 236, 239);
-            employeesGrid.Location = new Point(16, 16);
             employeesGrid.MultiSelect = false;
             employeesGrid.Name = "employeesGrid";
             employeesGrid.ReadOnly = true;
             employeesGrid.RowHeadersVisible = false;
-            employeesGrid.RowTemplate.Height = 40;
+            employeesGrid.RowTemplate.Height = 42;
             employeesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            employeesGrid.Size = new Size(844, 358);
             employeesGrid.TabIndex = 0;
 
+            // Header style
+            employeesGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 250);
+            employeesGrid.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(73, 80, 87);
+            employeesGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            employeesGrid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(248, 249, 250);
+            employeesGrid.ColumnHeadersDefaultCellStyle.Padding = new Padding(10, 0, 0, 0);
+            // Cell style
+            employeesGrid.DefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
+            employeesGrid.DefaultCellStyle.ForeColor = Color.FromArgb(51, 51, 51);
+            employeesGrid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(219, 234, 254);
+            employeesGrid.DefaultCellStyle.SelectionForeColor = Color.FromArgb(33, 37, 41);
+            employeesGrid.DefaultCellStyle.Padding = new Padding(10, 0, 0, 0);
+            employeesGrid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 252, 255);
+
+            // columnUsername
             columnUsername.HeaderText = "Tài khoản";
             columnUsername.Name = "columnUsername";
             columnUsername.ReadOnly = true;
+            columnUsername.FillWeight = 100;
 
+            // columnFullName
             columnFullName.HeaderText = "Họ tên";
             columnFullName.Name = "columnFullName";
             columnFullName.ReadOnly = true;
+            columnFullName.FillWeight = 155;
 
+            // columnEmail
             columnEmail.HeaderText = "Email";
             columnEmail.Name = "columnEmail";
             columnEmail.ReadOnly = true;
+            columnEmail.FillWeight = 195;
 
+            // columnPhone
             columnPhone.HeaderText = "Số điện thoại";
             columnPhone.Name = "columnPhone";
             columnPhone.ReadOnly = true;
+            columnPhone.FillWeight = 105;
 
+            // columnRole — centered, bold for Admin at runtime
             columnRole.HeaderText = "Vai trò";
             columnRole.Name = "columnRole";
             columnRole.ReadOnly = true;
+            columnRole.FillWeight = 80;
+            columnRole.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            columnRole.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
+            // columnStatus — color-coded at runtime
             columnStatus.HeaderText = "Trạng thái";
             columnStatus.Name = "columnStatus";
             columnStatus.ReadOnly = true;
+            columnStatus.FillWeight = 115;
 
             panelRoot.ResumeLayout(false);
             panelTable.ResumeLayout(false);
             ((ISupportInitialize)employeesGrid).EndInit();
             panelToolbar.ResumeLayout(false);
             panelToolbar.PerformLayout();
-            panelIntro.ResumeLayout(false);
-            panelIntro.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
 
         private Panel panelRoot;
-        private RoundedPanel panelIntro;
-        private Label labelIntroTitle;
-        private Label labelIntroDescription;
+        private Panel panelGap;
         private RoundedPanel panelToolbar;
-        private Label labelSearchEmployee;
         private RoundedTextBox textSearchEmployee;
-        private Label labelStatusFilter;
         private ComboBox comboStatusFilter;
-        private Label labelRoleFilter;
         private ComboBox comboRoleFilter;
         private RoundedButton buttonAddEmployee;
         private RoundedButton buttonEditEmployee;

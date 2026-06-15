@@ -5,11 +5,11 @@ namespace PharmacyManagementSystem;
 public class EmployeeEditorForm : Form
 {
     private readonly SaveEmployeeDTO? _currentEmployee;
-    private readonly TextBox _usernameTextBox = new();
-    private readonly TextBox _passwordTextBox = new();
-    private readonly TextBox _fullNameTextBox = new();
-    private readonly TextBox _emailTextBox = new();
-    private readonly TextBox _phoneTextBox = new();
+    private readonly RoundedTextBox _usernameTextBox = new();
+    private readonly RoundedTextBox _passwordTextBox = new();
+    private readonly RoundedTextBox _fullNameTextBox = new();
+    private readonly RoundedTextBox _emailTextBox = new();
+    private readonly RoundedTextBox _phoneTextBox = new();
     private readonly ComboBox _roleComboBox = new();
     private readonly CheckBox _activeCheckBox = new();
 
@@ -17,7 +17,6 @@ public class EmployeeEditorForm : Form
     {
         _currentEmployee = currentEmployee;
         EmployeeInput = currentEmployee;
-
         InitializeForm();
         BindCurrentEmployee();
         this.WireClickOutsideToBlur();
@@ -27,57 +26,60 @@ public class EmployeeEditorForm : Form
 
     private void InitializeForm()
     {
-        Text = _currentEmployee is null ? "Thêm nhân viên" : "Sửa nhân viên";
-        BackColor = Color.FromArgb(248, 249, 250);
-        ClientSize = new Size(520, 430);
-        Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+        var isEdit = _currentEmployee is not null;
+
+        Text = isEdit ? "Sửa nhân viên" : "Thêm nhân viên";
+        BackColor = Color.White;
+        ClientSize = new Size(520, 490);
+        Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
         StartPosition = FormStartPosition.CenterParent;
 
-        var layout = new TableLayoutPanel
+        // ── Header ───────────────────────────────────────────────────
+        var panelHeader = new Panel
         {
-            ColumnCount = 2,
+            BackColor = Color.FromArgb(13, 110, 253),
             Dock = DockStyle.Top,
-            Location = new Point(20, 20),
-            RowCount = 7,
-            Size = new Size(480, 320)
+            Height = 72
         };
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        panelHeader.Controls.Add(new Label
+        {
+            AutoSize = false,
+            Dock = DockStyle.Fill,
+            Font = new Font("Segoe UI", 14F, FontStyle.Bold, GraphicsUnit.Point),
+            ForeColor = Color.White,
+            Padding = new Padding(24, 0, 0, 4),
+            Text = isEdit ? "Sửa thông tin nhân viên" : "Thêm nhân viên mới",
+            TextAlign = ContentAlignment.MiddleLeft
+        });
 
-        AddTextRow(layout, "Tên đăng nhập", _usernameTextBox, 0);
-        AddTextRow(layout, _currentEmployee is null ? "Mật khẩu" : "Mật khẩu mới", _passwordTextBox, 1);
-        _passwordTextBox.UseSystemPasswordChar = true;
-        AddTextRow(layout, "Họ tên", _fullNameTextBox, 2);
-        AddTextRow(layout, "Email", _emailTextBox, 3);
-        AddTextRow(layout, "Số điện thoại", _phoneTextBox, 4);
-
-        _roleComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-        _roleComboBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-        _roleComboBox.Items.AddRange(new object[] { "Staff", "Admin" });
-        _roleComboBox.SelectedIndex = 0;
-        AddControlRow(layout, "Vai trò", _roleComboBox, 5);
-
-        _activeCheckBox.Text = "Đang hoạt động";
-        _activeCheckBox.Checked = true;
-        _activeCheckBox.AutoSize = true;
-        _activeCheckBox.Font = Font;
-        AddControlRow(layout, "Trạng thái", _activeCheckBox, 6);
+        // ── Footer ───────────────────────────────────────────────────
+        var panelFooter = new Panel
+        {
+            BackColor = Color.FromArgb(248, 249, 250),
+            Dock = DockStyle.Bottom,
+            Height = 64
+        };
+        panelFooter.Paint += (_, e) =>
+        {
+            using var pen = new Pen(Color.FromArgb(222, 226, 230));
+            e.Graphics.DrawLine(pen, 0, 0, panelFooter.Width, 0);
+        };
 
         var saveButton = new RoundedButton
         {
-            BackColor = Color.FromArgb(0, 123, 255),
-            BorderRadius = 12,
+            BackColor = Color.FromArgb(13, 110, 253),
+            BorderRadius = 10,
             BorderSize = 0,
             FlatStyle = FlatStyle.Flat,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.White,
-            HoverBackColor = Color.FromArgb(0, 113, 235),
-            Location = new Point(290, 365),
-            Size = new Size(96, 38),
-            Text = "Lưu",
+            HoverBackColor = Color.FromArgb(0, 86, 204),
+            Margin = new Padding(12, 0, 0, 0),
+            Size = new Size(130, 40),
+            Text = isEdit ? "Lưu thay đổi" : "Thêm mới",
             UseVisualStyleBackColor = false
         };
         saveButton.FlatAppearance.BorderSize = 0;
@@ -85,24 +87,86 @@ public class EmployeeEditorForm : Form
 
         var cancelButton = new RoundedButton
         {
-            BackColor = Color.FromArgb(108, 117, 125),
-            BorderRadius = 12,
-            BorderSize = 0,
+            BackColor = Color.White,
+            BorderColor = Color.FromArgb(206, 212, 218),
+            BorderRadius = 10,
+            BorderSize = 1,
             DialogResult = DialogResult.Cancel,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point),
-            ForeColor = Color.White,
-            HoverBackColor = Color.FromArgb(98, 106, 113),
-            Location = new Point(400, 365),
-            Size = new Size(96, 38),
+            Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
+            ForeColor = Color.FromArgb(73, 80, 87),
+            HoverBackColor = Color.FromArgb(241, 243, 245),
+            Margin = new Padding(0),
+            Size = new Size(110, 40),
             Text = "Hủy",
             UseVisualStyleBackColor = false
         };
         cancelButton.FlatAppearance.BorderSize = 0;
 
-        Controls.Add(layout);
-        Controls.Add(saveButton);
-        Controls.Add(cancelButton);
+        var buttonFlow = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.RightToLeft,
+            Padding = new Padding(0, 12, 24, 0),
+            WrapContents = false
+        };
+        buttonFlow.Controls.Add(saveButton);
+        buttonFlow.Controls.Add(cancelButton);
+        panelFooter.Controls.Add(buttonFlow);
+
+        // ── Body ─────────────────────────────────────────────────────
+        var panelBody = new Panel
+        {
+            BackColor = Color.White,
+            Dock = DockStyle.Fill,
+            Padding = new Padding(24, 18, 24, 8)
+        };
+
+        var layout = new TableLayoutPanel
+        {
+            ColumnCount = 2,
+            Dock = DockStyle.Fill,
+            RowCount = 7
+        };
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 128F));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+
+        foreach (var rtb in new[] { _usernameTextBox, _passwordTextBox, _fullNameTextBox, _emailTextBox, _phoneTextBox })
+        {
+            rtb.BackColor = Color.White;
+            rtb.BorderColor = Color.FromArgb(206, 212, 218);
+            rtb.BorderRadius = 10;
+            rtb.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            rtb.ForeColor = Color.FromArgb(51, 51, 51);
+            rtb.Size = new Size(200, 38);
+        }
+        _passwordTextBox.UseSystemPasswordChar = true;
+
+        AddRow(layout, "Tên đăng nhập", _usernameTextBox, 0);
+        AddRow(layout, isEdit ? "Mật khẩu mới" : "Mật khẩu", _passwordTextBox, 1);
+        AddRow(layout, "Họ và tên", _fullNameTextBox, 2);
+        AddRow(layout, "Email", _emailTextBox, 3);
+        AddRow(layout, "Số điện thoại", _phoneTextBox, 4);
+
+        _roleComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        _roleComboBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        _roleComboBox.Items.AddRange(new object[] { "Staff", "Admin" });
+        _roleComboBox.SelectedIndex = 0;
+        AddRow(layout, "Vai trò", _roleComboBox, 5);
+
+        _activeCheckBox.AutoSize = true;
+        _activeCheckBox.Checked = true;
+        _activeCheckBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        _activeCheckBox.ForeColor = Color.FromArgb(51, 51, 51);
+        _activeCheckBox.Text = "Đang hoạt động";
+        AddRow(layout, "Trạng thái", _activeCheckBox, 6, rowHeight: 42);
+
+        panelBody.Controls.Add(layout);
+
+        Controls.Add(panelBody);
+        Controls.Add(panelFooter);
+        Controls.Add(panelHeader);
+
         AcceptButton = saveButton;
         CancelButton = cancelButton;
     }
@@ -140,24 +204,19 @@ public class EmployeeEditorForm : Form
         Close();
     }
 
-    private static void AddTextRow(TableLayoutPanel layout, string labelText, TextBox textBox, int row)
+    private static void AddRow(TableLayoutPanel layout, string labelText, Control control, int row, int rowHeight = 46)
     {
-        textBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-        textBox.Width = 330;
-        AddControlRow(layout, labelText, textBox, row);
-    }
-
-    private static void AddControlRow(TableLayoutPanel layout, string labelText, Control control, int row)
-    {
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, rowHeight));
 
         var label = new Label
         {
-            AutoSize = true,
-            Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
-            ForeColor = Color.FromArgb(51, 51, 51),
-            Margin = new Padding(0, 8, 12, 0),
-            Text = labelText
+            AutoSize = false,
+            Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point),
+            ForeColor = Color.FromArgb(73, 80, 87),
+            Margin = new Padding(0, 14, 12, 0),
+            Size = new Size(128, 18),
+            Text = labelText,
+            TextAlign = ContentAlignment.TopLeft
         };
 
         control.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
