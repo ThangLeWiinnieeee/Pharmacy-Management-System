@@ -68,6 +68,13 @@ namespace PharmacyManagementSystem
             set => _textBox.UseSystemPasswordChar = value;
         }
 
+        [Category("Behavior")]
+        public string PlaceholderText
+        {
+            get => _textBox.PlaceholderText;
+            set => _textBox.PlaceholderText = value ?? string.Empty;
+        }
+
         [Category("Appearance")]
         public int BorderRadius
         {

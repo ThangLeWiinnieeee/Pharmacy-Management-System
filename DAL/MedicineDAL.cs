@@ -2,13 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using PharmacyManagementSystem.DTO.Input;
 using PharmacyManagementSystem.Entities;
 using PharmacyManagementSystem.Interfaces.IDAL;
+using static PharmacyManagementSystem.MedicineStatusHelper;
 
 namespace PharmacyManagementSystem.DAL;
 
 public class MedicineDAL : IMedicineDAL
 {
-    private const int LowStockThreshold = 10;
-    private const int ExpiringSoonDays = 30;
 
     public List<Medicine> GetMedicines(MedicineQueryDTO query)
     {
@@ -56,6 +55,18 @@ public class MedicineDAL : IMedicineDAL
         context.Medicines.Add(medicine);
         context.SaveChanges();
 
+        // Auto-create initial batch record
+        context.MedicineBatches.Add(new MedicineBatch
+        {
+            MedicineId = medicine.Id,
+            ImportDate = medicine.CreatedAt,
+            ImportQuantity = medicine.Quantity,
+            ExpiryDate = medicine.ExpiryDate,
+            ImportPrice = medicine.ImportPrice,
+            Note = null
+        });
+        context.SaveChanges();
+
         return medicine;
     }
 
@@ -84,18 +95,22 @@ public class MedicineDAL : IMedicineDAL
     private static IQueryable<Medicine> ApplyStatusFilter(IQueryable<Medicine> medicines, string? statusFilter)
     {
         var today = DateTime.Today;
-        var expiringSoonDate = today.AddDays(ExpiringSoonDays);
+        var nearExpiryDate = today.AddMonths(MedicineStatusHelper.NearExpiryMonths);
 
         return statusFilter switch
         {
             "Đang kinh doanh" => medicines.Where(medicine => medicine.IsActive),
-            "Ngừng bán" => medicines.Where(medicine => !medicine.IsActive),
-            "Sắp hết hàng" => medicines.Where(medicine => medicine.IsActive && medicine.Quantity <= LowStockThreshold),
-            "Sắp hết hạn" => medicines.Where(medicine =>
+            "Ngừng bán"       => medicines.Where(medicine => !medicine.IsActive),
+            "Sắp hết hàng"    => medicines.Where(medicine =>
                 medicine.IsActive
+                && medicine.Quantity > 0
+                && medicine.Quantity < LowStockThreshold),
+            "Sắp hết hạn"     => medicines.Where(medicine =>
+                medicine.IsActive
+                && medicine.Quantity > 0
                 && medicine.ExpiryDate.HasValue
                 && medicine.ExpiryDate.Value.Date >= today
-                && medicine.ExpiryDate.Value.Date <= expiringSoonDate),
+                && medicine.ExpiryDate.Value.Date < nearExpiryDate),
             _ => medicines
         };
     }

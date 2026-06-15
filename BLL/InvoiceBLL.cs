@@ -57,8 +57,20 @@ public class InvoiceBLL : IInvoiceBLL
         }
     }
 
+    public List<InvoiceDTO> GetInvoices(InvoiceQueryDTO query)
+    {
+        if (query.DateFrom.HasValue &&
+            query.DateTo.HasValue &&
+            query.DateFrom.Value.Date > query.DateTo.Value.Date)
+        {
+            return [];
+        }
+
+        return _invoiceDAL.GetInvoices(query);
+    }
+
     public List<InvoiceDTO> GetAll()
     {
-        return _invoiceDAL.GetAll();
+        return GetInvoices(new InvoiceQueryDTO());
     }
 }

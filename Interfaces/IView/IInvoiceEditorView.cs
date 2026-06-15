@@ -5,7 +5,7 @@ namespace PharmacyManagementSystem.Interfaces.IView;
 
 public interface IInvoiceEditorView
 {
-    /// <summary>Tên khách hàng nhập trên UI</summary>
+    /// <summary>Tên khách hàng đã tra cứu hoặc tạo mới (rỗng = khách lẻ)</summary>
     string CustomerName { get; }
 
     /// <summary>SĐT khách hàng nhập trên UI</summary>
@@ -34,4 +34,13 @@ public interface IInvoiceEditorView
 
     /// <summary>Mở dialog chọn nhiều thuốc để thêm vào giỏ hàng</summary>
     IReadOnlyList<InvoiceDetailInputDTO>? RequestSelectMedicines();
+
+    /// <summary>Hiện thông tin khách hàng tìm được theo SĐT</summary>
+    void ShowCustomerFound(CustomerLookupDTO customer);
+
+    /// <summary>Thông báo SĐT chưa có trong hệ thống</summary>
+    void ShowCustomerNotFound(string phone);
+
+    /// <summary>Xóa kết quả tra cứu, về trạng thái ban đầu</summary>
+    void ClearCustomerStatus();
 }

@@ -34,6 +34,7 @@ namespace PharmacyManagementSystem
             columnExpiryDate = new DataGridViewTextBoxColumn();
             columnStatus = new DataGridViewTextBoxColumn();
             panelToolbar = new RoundedPanel();
+            buttonLookupDetail = new RoundedButton();
             buttonDeleteMedicine = new RoundedButton();
             buttonEditMedicine = new RoundedButton();
             buttonAddMedicine = new RoundedButton();
@@ -102,6 +103,7 @@ namespace PharmacyManagementSystem
             panelToolbar.BorderColor = Color.FromArgb(224, 229, 235);
             panelToolbar.BorderRadius = 16;
             panelToolbar.BorderSize = 1;
+            panelToolbar.Controls.Add(buttonLookupDetail);
             panelToolbar.Controls.Add(buttonDeleteMedicine);
             panelToolbar.Controls.Add(buttonEditMedicine);
             panelToolbar.Controls.Add(buttonAddMedicine);
@@ -132,6 +134,7 @@ namespace PharmacyManagementSystem
             textSearchMedicine.ForeColor = Color.FromArgb(51, 51, 51);
             textSearchMedicine.Location = new Point(24, 42);
             textSearchMedicine.Name = "textSearchMedicine";
+            textSearchMedicine.PlaceholderText = "Mã thuốc, tên thuốc...";
             textSearchMedicine.Size = new Size(280, 38);
             textSearchMedicine.TabIndex = 1;
 
@@ -150,7 +153,7 @@ namespace PharmacyManagementSystem
             comboStatusFilter.Items.AddRange(new object[] { "Tất cả", "Đang kinh doanh", "Ngừng bán", "Sắp hết hàng", "Sắp hết hạn" });
             comboStatusFilter.Location = new Point(326, 47);
             comboStatusFilter.Name = "comboStatusFilter";
-            comboStatusFilter.Size = new Size(180, 25);
+            comboStatusFilter.Size = new Size(150, 25);
             comboStatusFilter.TabIndex = 3;
 
             buttonAddMedicine.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -164,7 +167,7 @@ namespace PharmacyManagementSystem
             buttonAddMedicine.HoverBackColor = Color.FromArgb(0, 113, 235);
             buttonAddMedicine.Location = new Point(540, 42);
             buttonAddMedicine.Name = "buttonAddMedicine";
-            buttonAddMedicine.Size = new Size(100, 38);
+            buttonAddMedicine.Size = new Size(84, 38);
             buttonAddMedicine.TabIndex = 4;
             buttonAddMedicine.Text = "Thêm";
             buttonAddMedicine.UseVisualStyleBackColor = false;
@@ -180,7 +183,7 @@ namespace PharmacyManagementSystem
             buttonEditMedicine.HoverBackColor = Color.FromArgb(37, 154, 64);
             buttonEditMedicine.Location = new Point(650, 42);
             buttonEditMedicine.Name = "buttonEditMedicine";
-            buttonEditMedicine.Size = new Size(90, 38);
+            buttonEditMedicine.Size = new Size(80, 38);
             buttonEditMedicine.TabIndex = 5;
             buttonEditMedicine.Text = "Sửa";
             buttonEditMedicine.UseVisualStyleBackColor = false;
@@ -196,10 +199,31 @@ namespace PharmacyManagementSystem
             buttonDeleteMedicine.HoverBackColor = Color.FromArgb(201, 48, 62);
             buttonDeleteMedicine.Location = new Point(750, 42);
             buttonDeleteMedicine.Name = "buttonDeleteMedicine";
-            buttonDeleteMedicine.Size = new Size(100, 38);
+            buttonDeleteMedicine.Size = new Size(80, 38);
             buttonDeleteMedicine.TabIndex = 6;
             buttonDeleteMedicine.Text = "Xóa";
             buttonDeleteMedicine.UseVisualStyleBackColor = false;
+
+            buttonLookupDetail.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonLookupDetail.BackColor = Color.FromArgb(0, 123, 180);
+            buttonLookupDetail.BorderRadius = 12;
+            buttonLookupDetail.BorderSize = 0;
+            buttonLookupDetail.FlatAppearance.BorderSize = 0;
+            buttonLookupDetail.FlatStyle = FlatStyle.Flat;
+            buttonLookupDetail.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonLookupDetail.ForeColor = Color.White;
+            buttonLookupDetail.HoverBackColor = Color.FromArgb(0, 100, 155);
+            buttonLookupDetail.Location = new Point(488, 42);
+            buttonLookupDetail.Name = "buttonLookupDetail";
+            buttonLookupDetail.Size = new Size(110, 38);
+            buttonLookupDetail.TabIndex = 9;
+            buttonLookupDetail.Text = "Xem lô";
+            buttonLookupDetail.UseVisualStyleBackColor = false;
+
+            // Căn nút action sát phải panel (876px)
+            buttonAddMedicine.Location    = new Point(606, 42);
+            buttonEditMedicine.Location   = new Point(698, 42);
+            buttonDeleteMedicine.Location = new Point(786, 42);
 
             panelTable.BackColor = Color.White;
             panelTable.BorderColor = Color.FromArgb(224, 229, 235);
@@ -215,12 +239,16 @@ namespace PharmacyManagementSystem
 
             medicinesGrid.AllowUserToAddRows = false;
             medicinesGrid.AllowUserToDeleteRows = false;
+            medicinesGrid.AllowUserToResizeColumns = false;
+            medicinesGrid.AllowUserToResizeRows = false;
             medicinesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             medicinesGrid.BackgroundColor = Color.White;
             medicinesGrid.BorderStyle = BorderStyle.None;
             medicinesGrid.ColumnHeadersHeight = 42;
             medicinesGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             medicinesGrid.Columns.AddRange(new DataGridViewColumn[] { columnCode, columnName, columnUnit, columnQuantity, columnSellPrice, columnExpiryDate, columnStatus });
+            foreach (DataGridViewColumn col in medicinesGrid.Columns)
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
             medicinesGrid.Dock = DockStyle.Fill;
             medicinesGrid.EnableHeadersVisualStyles = false;
             medicinesGrid.GridColor = Color.FromArgb(233, 236, 239);
@@ -286,6 +314,7 @@ namespace PharmacyManagementSystem
         private RoundedButton buttonAddMedicine;
         private RoundedButton buttonEditMedicine;
         private RoundedButton buttonDeleteMedicine;
+        private RoundedButton buttonLookupDetail;
         private RoundedPanel panelTable;
         private DataGridView medicinesGrid;
         private DataGridViewTextBoxColumn columnCode;

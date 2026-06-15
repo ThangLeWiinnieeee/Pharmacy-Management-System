@@ -19,22 +19,24 @@ public partial class MainForm : Form, IDashboardView
         _dashboardPresenter = new DashboardPresenter(this);
 
         InitializeComponent();
+        medicineManagementView.IsAdmin = currentUser.Role == "Admin";
         RegisterNavigationEvents();
         BindCurrentUser();
         ShowDashboardPage();
-        Load += (_, _) => _dashboardPresenter.LoadDashboard();
     }
 
     public void ShowDashboardStats(DashboardStatsDTO stats)
     {
-        labelTotalMedicineValue.Text = FormatNumber(stats.TotalMedicineTypes);
-        labelActiveMedicineValue.Text = FormatNumber(stats.ActiveMedicineTypes);
-        labelStockQuantityValue.Text = FormatNumber(stats.TotalStockQuantity);
-        labelLowStockValue.Text = FormatNumber(stats.LowStockMedicineTypes);
-        labelExpiringSoonValue.Text = FormatNumber(stats.ExpiringSoonMedicineTypes);
-        labelAdminValue.Text = FormatNumber(stats.AdminCount);
-        labelStaffValue.Text = FormatNumber(stats.StaffCount);
-        labelActiveUserValue.Text = FormatNumber(stats.ActiveUserCount);
+        labelTotalMedicineValue.Text   = FormatNumber(stats.TotalMedicineTypes);
+        labelActiveMedicineValue.Text  = FormatNumber(stats.ActiveMedicineTypes);
+        labelStockQuantityValue.Text   = FormatNumber(stats.TotalStockQuantity);
+        labelExpiringSoonValue.Text    = FormatNumber(stats.ExpiringSoonMedicineTypes);
+        labelLowStockValue.Text        = FormatNumber(stats.LowStockMedicineTypes);
+        labelStoppedValue.Text         = FormatNumber(stats.StoppedMedicineTypes);
+        labelExpiredValue.Text         = FormatNumber(stats.ExpiredMedicineTypes);
+        labelAdminValue.Text           = FormatNumber(stats.AdminCount);
+        labelStaffValue.Text           = FormatNumber(stats.StaffCount);
+        labelActiveUserValue.Text      = FormatNumber(stats.CustomerCount);
     }
 
     public void ShowDashboardError(string message)
@@ -48,10 +50,8 @@ public partial class MainForm : Form, IDashboardView
         sideNavigationMenu.DashboardRequested += (_, _) => ShowDashboardPage();
         sideNavigationMenu.MedicineRequested += (_, _) => ShowMedicinePage();
         sideNavigationMenu.EmployeeRequested += (_, _) => ShowEmployeePage();
-        sideNavigationMenu.InvoiceRequested += (_, _) => ShowPlaceholderPage(
-            SideNavigationMenuItem.Invoice,
-            "Hóa đơn",
-            "Khu vực lập hóa đơn, theo dõi giao dịch bán hàng và lịch sử thanh toán.");
+        sideNavigationMenu.InvoiceRequested += (_, _) => ShowInvoiceHistoryPage();
+        sideNavigationMenu.CustomerRequested += (_, _) => ShowCustomerPage();
         sideNavigationMenu.ReportRequested += (_, _) => ShowPlaceholderPage(
             SideNavigationMenuItem.Report,
             "Báo cáo",
@@ -72,6 +72,7 @@ public partial class MainForm : Form, IDashboardView
         labelHeaderSubtitle.ForeColor = MutedTextColor;
         Text = "Dashboard";
         sideNavigationMenu.SetActiveItem(SideNavigationMenuItem.Dashboard);
+        _dashboardPresenter.LoadDashboard();
     }
 
     private void ShowMedicinePage()
@@ -94,6 +95,27 @@ public partial class MainForm : Form, IDashboardView
         sideNavigationMenu.SetActiveItem(SideNavigationMenuItem.Employee);
     }
 
+    private void ShowCustomerPage()
+    {
+        customerManagementView.Reload();
+        ShowOnly(customerManagementView);
+        labelHeaderTitle.Text = "Quản lý khách hàng";
+        labelHeaderSubtitle.Text = "Danh sách khách hàng, thông tin liên hệ và lịch sử mua hàng";
+        labelHeaderSubtitle.ForeColor = MutedTextColor;
+        Text = "Quản lý khách hàng";
+        sideNavigationMenu.SetActiveItem(SideNavigationMenuItem.Customer);
+    }
+
+    private void ShowInvoiceHistoryPage()
+    {
+        ShowOnly(invoiceHistoryView);
+        labelHeaderTitle.Text = "Lịch sử bán hàng";
+        labelHeaderSubtitle.Text = "Tra cứu hóa đơn, chi tiết thuốc đã bán và tổng doanh thu";
+        labelHeaderSubtitle.ForeColor = MutedTextColor;
+        Text = "Lịch sử bán hàng";
+        sideNavigationMenu.SetActiveItem(SideNavigationMenuItem.Invoice);
+    }
+
     private void ShowPlaceholderPage(SideNavigationMenuItem selectedItem, string title, string description)
     {
         ShowOnly(panelPlaceholder);
@@ -111,6 +133,8 @@ public partial class MainForm : Form, IDashboardView
         panelDashboard.Visible = activeControl == panelDashboard;
         medicineManagementView.Visible = activeControl == medicineManagementView;
         employeeManagementView.Visible = activeControl == employeeManagementView;
+        invoiceHistoryView.Visible = activeControl == invoiceHistoryView;
+        customerManagementView.Visible = activeControl == customerManagementView;
         panelPlaceholder.Visible = activeControl == panelPlaceholder;
     }
 

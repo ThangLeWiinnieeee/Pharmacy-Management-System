@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using PharmacyManagementSystem.BLL.Validations;
+using PharmacyManagementSystem.DAL;
 using PharmacyManagementSystem.DTO.Input;
 using PharmacyManagementSystem.DTO.Output;
 using PharmacyManagementSystem.Entities;
@@ -17,10 +18,12 @@ public class AuthBLL : IAuthBLL
     private const string StaffRole = "Staff";
 
     private readonly IUserDAL _userDAL;
+    private readonly RememberMeTokenDAL _tokenDAL;
 
-    public AuthBLL(IUserDAL userDAL)
+    public AuthBLL(IUserDAL userDAL, RememberMeTokenDAL? tokenDAL = null)
     {
-        _userDAL = userDAL;
+        _userDAL  = userDAL;
+        _tokenDAL = tokenDAL ?? new RememberMeTokenDAL();
     }
 
     public LoginResultDTO Login(LoginUserDTO request)
@@ -99,6 +102,26 @@ public class AuthBLL : IAuthBLL
         {
             return RegisterResultDTO.Failure("Không thể đăng ký tài khoản. Vui lòng kiểm tra kết nối dữ liệu và thử lại.");
         }
+    }
+
+    public UserDTO? LoginWithToken(string rawToken)
+    {
+        try
+        {
+            var user = _tokenDAL.ValidateAndRenew(rawToken);
+            return user is null ? null : MapToDTO(user);
+        }
+        catch { return null; }
+    }
+
+    public string CreateRememberToken(int userId)
+    {
+        return _tokenDAL.Create(userId);
+    }
+
+    public void RevokeRememberToken(string rawToken)
+    {
+        try { _tokenDAL.Revoke(rawToken); } catch { /* best-effort */ }
     }
 
     private static bool VerifyPassword(string password, string passwordHash)

@@ -29,6 +29,10 @@ public class AppDbContext : DbContext
 
     public DbSet<InvoiceDetail> InvoiceDetails => Set<InvoiceDetail>();
 
+    public DbSet<MedicineBatch> MedicineBatches => Set<MedicineBatch>();
+
+    public DbSet<RememberMeToken> RememberMeTokens => Set<RememberMeToken>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured)
@@ -50,6 +54,8 @@ public class AppDbContext : DbContext
     {
         ConfigureUser(modelBuilder);
         ConfigureMedicine(modelBuilder);
+        ConfigureMedicineBatch(modelBuilder);
+        ConfigureRememberMeToken(modelBuilder);
         ConfigureCustomer(modelBuilder);
         ConfigureInvoice(modelBuilder);
         ConfigureInvoiceDetail(modelBuilder);
@@ -139,6 +145,32 @@ public class AppDbContext : DbContext
             .HasDefaultValueSql("GETDATE()");
     }
 
+    private static void ConfigureMedicineBatch(ModelBuilder modelBuilder)
+    {
+        var batch = modelBuilder.Entity<MedicineBatch>();
+
+        batch.ToTable("MedicineBatches");
+        batch.HasKey(b => b.Id);
+
+        batch.Property(b => b.ImportDate)
+            .HasDefaultValueSql("GETDATE()");
+
+        batch.Property(b => b.ImportQuantity)
+            .HasDefaultValue(0);
+
+        batch.Property(b => b.ImportPrice)
+            .HasPrecision(18, 2)
+            .HasDefaultValue(0m);
+
+        batch.Property(b => b.Note)
+            .HasMaxLength(500);
+
+        batch.HasOne(b => b.Medicine)
+            .WithMany()
+            .HasForeignKey(b => b.MedicineId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
     private static void ConfigureCustomer(ModelBuilder modelBuilder)
     {
         var customer = modelBuilder.Entity<Customer>();
@@ -210,6 +242,21 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(i => i.CreatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private static void ConfigureRememberMeToken(ModelBuilder modelBuilder)
+    {
+        var token = modelBuilder.Entity<RememberMeToken>();
+        token.ToTable("RememberMeTokens");
+        token.HasKey(t => t.Id);
+        token.Property(t => t.TokenHash).HasMaxLength(64).IsRequired();
+        token.Property(t => t.ExpiresAt).IsRequired();
+        token.Property(t => t.CreatedAt).HasDefaultValueSql("GETDATE()");
+        token.HasIndex(t => t.TokenHash);
+        token.HasOne(t => t.User)
+            .WithMany()
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureInvoiceDetail(ModelBuilder modelBuilder)

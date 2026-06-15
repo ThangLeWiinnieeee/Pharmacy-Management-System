@@ -133,6 +133,7 @@ namespace PharmacyManagementSystem
             textSearchEmployee.ForeColor = Color.FromArgb(51, 51, 51);
             textSearchEmployee.Location = new Point(24, 42);
             textSearchEmployee.Name = "textSearchEmployee";
+            textSearchEmployee.PlaceholderText = "Tên nhân viên, username...";
             textSearchEmployee.Size = new Size(250, 38);
             textSearchEmployee.TabIndex = 1;
 
@@ -234,12 +235,16 @@ namespace PharmacyManagementSystem
 
             employeesGrid.AllowUserToAddRows = false;
             employeesGrid.AllowUserToDeleteRows = false;
+            employeesGrid.AllowUserToResizeColumns = false;
+            employeesGrid.AllowUserToResizeRows = false;
             employeesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             employeesGrid.BackgroundColor = Color.White;
             employeesGrid.BorderStyle = BorderStyle.None;
             employeesGrid.ColumnHeadersHeight = 42;
             employeesGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             employeesGrid.Columns.AddRange(new DataGridViewColumn[] { columnUsername, columnFullName, columnEmail, columnPhone, columnRole, columnStatus });
+            foreach (DataGridViewColumn col in employeesGrid.Columns)
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
             employeesGrid.Dock = DockStyle.Fill;
             employeesGrid.EnableHeadersVisualStyles = false;
             employeesGrid.GridColor = Color.FromArgb(233, 236, 239);

@@ -7,5 +7,7 @@ public interface IInvoiceDAL
 {
     InvoiceDTO Create(CreateInvoiceDTO request);
 
+    List<InvoiceDTO> GetInvoices(InvoiceQueryDTO query);
+
     List<InvoiceDTO> GetAll();
 }

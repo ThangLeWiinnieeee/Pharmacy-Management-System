@@ -15,6 +15,7 @@ namespace PharmacyManagementSystem
 
             buttonBack.Click += HandleBackClick;
             buttonRegister.Click += HandleRegisterClick;
+            this.WireClickOutsideToBlur();
         }
 
         public string FullName => textBoxFullName.Text.Trim();

@@ -41,9 +41,12 @@ namespace PharmacyManagementSystem
             labelHeaderSubtitle = new Label();
             panelContent = new Panel();
             panelDashboard = new Panel();
-            tableStats = new TableLayoutPanel();
+            tableMedicine = new TableLayoutPanel();
+            tablePeople = new TableLayoutPanel();
             medicineManagementView = new MedicineManagementView();
             employeeManagementView = new EmployeeManagementView();
+            invoiceHistoryView = new InvoiceHistoryView();
+            customerManagementView = new CustomerManagementView();
             panelPlaceholder = new Panel();
             panelPlaceholderCard = new RoundedPanel();
             labelPlaceholderTitle = new Label();
@@ -52,7 +55,8 @@ namespace PharmacyManagementSystem
             panelHeader.SuspendLayout();
             panelContent.SuspendLayout();
             panelDashboard.SuspendLayout();
-            tableStats.SuspendLayout();
+            tableMedicine.SuspendLayout();
+            tablePeople.SuspendLayout();
             panelPlaceholder.SuspendLayout();
             panelPlaceholderCard.SuspendLayout();
             SuspendLayout();
@@ -102,6 +106,8 @@ namespace PharmacyManagementSystem
 
             panelContent.BackColor = Color.FromArgb(248, 249, 250);
             panelContent.Controls.Add(panelPlaceholder);
+            panelContent.Controls.Add(customerManagementView);
+            panelContent.Controls.Add(invoiceHistoryView);
             panelContent.Controls.Add(employeeManagementView);
             panelContent.Controls.Add(medicineManagementView);
             panelContent.Controls.Add(panelDashboard);
@@ -112,110 +118,140 @@ namespace PharmacyManagementSystem
             panelContent.Size = new Size(932, 666);
             panelContent.TabIndex = 1;
 
+            // ── Section labels & gap (local — no field needed) ──────────────────────
+            var labelMedicineSection = new Label
+            {
+                AutoSize = false, Dock = DockStyle.Top, Height = 36,
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold, GraphicsUnit.Point),
+                ForeColor = Color.FromArgb(51, 51, 51),
+                Padding = new Padding(0, 0, 0, 8),
+                TextAlign = ContentAlignment.BottomLeft,
+                Text = "Thuốc"
+            };
+            var labelPeopleSection = new Label
+            {
+                AutoSize = false, Dock = DockStyle.Top, Height = 36,
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold, GraphicsUnit.Point),
+                ForeColor = Color.FromArgb(51, 51, 51),
+                Padding = new Padding(0, 0, 0, 8),
+                TextAlign = ContentAlignment.BottomLeft,
+                Text = "Con người"
+            };
+            var panelSectionGap = new Panel
+            {
+                BackColor = Color.FromArgb(248, 249, 250),
+                Dock = DockStyle.Top,
+                Height = 20
+            };
+
             panelDashboard.BackColor = Color.FromArgb(248, 249, 250);
-            panelDashboard.Controls.Add(tableStats);
+            // Controls added in reverse — last added with Dock=Top appears topmost
+            panelDashboard.Controls.Add(tablePeople);
+            panelDashboard.Controls.Add(labelPeopleSection);
+            panelDashboard.Controls.Add(panelSectionGap);
+            panelDashboard.Controls.Add(tableMedicine);
+            panelDashboard.Controls.Add(labelMedicineSection);
             panelDashboard.Dock = DockStyle.Fill;
             panelDashboard.Location = new Point(28, 28);
             panelDashboard.Name = "panelDashboard";
             panelDashboard.Size = new Size(876, 610);
             panelDashboard.TabIndex = 0;
 
-            tableStats.ColumnCount = 4;
-            tableStats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableStats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableStats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableStats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableStats.Dock = DockStyle.Fill;
-            tableStats.Location = new Point(0, 0);
-            tableStats.Margin = new Padding(0);
-            tableStats.Name = "tableStats";
-            tableStats.RowCount = 2;
-            tableStats.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableStats.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableStats.Size = new Size(876, 610);
-            tableStats.TabIndex = 0;
+            // ── tableMedicine — 4 cols × 2 rows (7 cards) ──────────────────────────
+            tableMedicine.ColumnCount = 4;
+            tableMedicine.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableMedicine.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableMedicine.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableMedicine.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableMedicine.Dock = DockStyle.Top;
+            tableMedicine.Height = 276;   // row0: 146px (card 130 + margin 16) + row1: 130px
+            tableMedicine.Margin = new Padding(0);
+            tableMedicine.Name = "tableMedicine";
+            tableMedicine.RowCount = 2;
+            tableMedicine.RowStyles.Add(new RowStyle(SizeType.Absolute, 146F));
+            tableMedicine.RowStyles.Add(new RowStyle(SizeType.Absolute, 130F));
+            tableMedicine.TabIndex = 0;
 
+            // ── tablePeople — 3 cols × 1 row (3 cards) ─────────────────────────────
+            tablePeople.ColumnCount = 3;
+            tablePeople.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tablePeople.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tablePeople.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tablePeople.Dock = DockStyle.Top;
+            tablePeople.Height = 130;
+            tablePeople.Margin = new Padding(0);
+            tablePeople.Name = "tablePeople";
+            tablePeople.RowCount = 1;
+            tablePeople.RowStyles.Add(new RowStyle(SizeType.Absolute, 130F));
+            tablePeople.TabIndex = 1;
+
+            // ── Medicine cards ──────────────────────────────────────────────────────
             cardTotalMedicine = CreateStatCard(
-                "cardTotalMedicine",
-                Color.FromArgb(0, 123, 255),
-                "Loại thuốc",
-                "Tất cả mã thuốc",
-                out accentTotalMedicine,
-                out labelTotalMedicineTitle,
-                out labelTotalMedicineValue,
-                out labelTotalMedicineDescription);
+                "cardTotalMedicine", Color.FromArgb(0, 123, 255),
+                "Loại thuốc", "Tất cả mã thuốc",
+                out accentTotalMedicine, out labelTotalMedicineTitle,
+                out labelTotalMedicineValue, out labelTotalMedicineDescription);
             cardActiveMedicine = CreateStatCard(
-                "cardActiveMedicine",
-                Color.FromArgb(40, 167, 69),
-                "Đang kinh doanh",
-                "Mã thuốc còn hiệu lực",
-                out accentActiveMedicine,
-                out labelActiveMedicineTitle,
-                out labelActiveMedicineValue,
-                out labelActiveMedicineDescription);
+                "cardActiveMedicine", Color.FromArgb(40, 167, 69),
+                "Đang kinh doanh", "Mã thuốc còn hiệu lực",
+                out accentActiveMedicine, out labelActiveMedicineTitle,
+                out labelActiveMedicineValue, out labelActiveMedicineDescription);
             cardStockQuantity = CreateStatCard(
-                "cardStockQuantity",
-                Color.FromArgb(23, 162, 184),
-                "Tổng tồn kho",
-                "Số lượng thuốc hiện có",
-                out accentStockQuantity,
-                out labelStockQuantityTitle,
-                out labelStockQuantityValue,
-                out labelStockQuantityDescription);
-            cardLowStock = CreateStatCard(
-                "cardLowStock",
-                Color.FromArgb(255, 193, 7),
-                "Sắp hết hàng",
-                "Tồn kho từ 10 trở xuống",
-                out accentLowStock,
-                out labelLowStockTitle,
-                out labelLowStockValue,
-                out labelLowStockDescription);
+                "cardStockQuantity", Color.FromArgb(23, 162, 184),
+                "Tổng tồn kho", "Số lượng thuốc hiện có",
+                out accentStockQuantity, out labelStockQuantityTitle,
+                out labelStockQuantityValue, out labelStockQuantityDescription);
             cardExpiringSoon = CreateStatCard(
-                "cardExpiringSoon",
-                Color.FromArgb(220, 53, 69),
-                "Sắp hết hạn",
-                "Hạn dùng trong 30 ngày",
-                out accentExpiringSoon,
-                out labelExpiringSoonTitle,
-                out labelExpiringSoonValue,
-                out labelExpiringSoonDescription);
-            cardAdmin = CreateStatCard(
-                "cardAdmin",
-                Color.FromArgb(111, 66, 193),
-                "Quản trị viên",
-                "Tài khoản Admin",
-                out accentAdmin,
-                out labelAdminTitle,
-                out labelAdminValue,
-                out labelAdminDescription);
-            cardStaff = CreateStatCard(
-                "cardStaff",
-                Color.FromArgb(0, 86, 179),
-                "Nhân viên",
-                "Tài khoản Staff",
-                out accentStaff,
-                out labelStaffTitle,
-                out labelStaffValue,
-                out labelStaffDescription);
-            cardActiveUser = CreateStatCard(
-                "cardActiveUser",
-                Color.FromArgb(52, 58, 64),
-                "Người dùng",
-                "Tài khoản đang hoạt động",
-                out accentActiveUser,
-                out labelActiveUserTitle,
-                out labelActiveUserValue,
-                out labelActiveUserDescription);
+                "cardExpiringSoon", Color.FromArgb(220, 130, 0),
+                "Sắp hết hạn", "Hạn dùng trong 3 tháng",
+                out accentExpiringSoon, out labelExpiringSoonTitle,
+                out labelExpiringSoonValue, out labelExpiringSoonDescription);
+            cardLowStock = CreateStatCard(
+                "cardLowStock", Color.FromArgb(255, 193, 7),
+                "Sắp hết hàng", "Tồn kho dưới 10 đơn vị",
+                out accentLowStock, out labelLowStockTitle,
+                out labelLowStockValue, out labelLowStockDescription);
+            cardStopped = CreateStatCard(
+                "cardStopped", Color.FromArgb(108, 117, 125),
+                "Ngừng bán", "Thuốc không kinh doanh",
+                out accentStopped, out labelStoppedTitle,
+                out labelStoppedValue, out labelStoppedDescription);
+            cardExpired = CreateStatCard(
+                "cardExpired", Color.FromArgb(140, 20, 40),
+                "Đã hết hạn", "Hạn dùng đã qua",
+                out accentExpired, out labelExpiredTitle,
+                out labelExpiredValue, out labelExpiredDescription);
 
-            AddStatCard(cardTotalMedicine, 0, 0, new Padding(0, 0, 16, 16));
-            AddStatCard(cardActiveMedicine, 1, 0, new Padding(0, 0, 16, 16));
-            AddStatCard(cardStockQuantity, 2, 0, new Padding(0, 0, 16, 16));
-            AddStatCard(cardLowStock, 3, 0, new Padding(0, 0, 0, 16));
-            AddStatCard(cardExpiringSoon, 0, 1, new Padding(0, 0, 16, 0));
-            AddStatCard(cardAdmin, 1, 1, new Padding(0, 0, 16, 0));
-            AddStatCard(cardStaff, 2, 1, new Padding(0, 0, 16, 0));
-            AddStatCard(cardActiveUser, 3, 1, new Padding(0));
+            // Row 0: Loại thuốc | Đang kinh doanh | Tổng tồn kho | Sắp hết hạn
+            AddStatCard(cardTotalMedicine,  0, 0, new Padding(0, 0, 16, 16), tableMedicine);
+            AddStatCard(cardActiveMedicine, 1, 0, new Padding(0, 0, 16, 16), tableMedicine);
+            AddStatCard(cardStockQuantity,  2, 0, new Padding(0, 0, 16, 16), tableMedicine);
+            AddStatCard(cardExpiringSoon,   3, 0, new Padding(0, 0,  0, 16), tableMedicine);
+            // Row 1: Sắp hết hàng | Ngừng bán | Đã hết hạn | (trống)
+            AddStatCard(cardLowStock, 0, 1, new Padding(0, 0, 16, 0), tableMedicine);
+            AddStatCard(cardStopped,  1, 1, new Padding(0, 0, 16, 0), tableMedicine);
+            AddStatCard(cardExpired,  2, 1, new Padding(0, 0, 16, 0), tableMedicine);
+
+            // ── People cards ────────────────────────────────────────────────────────
+            cardAdmin = CreateStatCard(
+                "cardAdmin", Color.FromArgb(111, 66, 193),
+                "Quản trị viên", "Tài khoản Admin",
+                out accentAdmin, out labelAdminTitle,
+                out labelAdminValue, out labelAdminDescription);
+            cardStaff = CreateStatCard(
+                "cardStaff", Color.FromArgb(0, 86, 179),
+                "Nhân viên", "Tài khoản Staff",
+                out accentStaff, out labelStaffTitle,
+                out labelStaffValue, out labelStaffDescription);
+            cardActiveUser = CreateStatCard(
+                "cardActiveUser", Color.FromArgb(23, 162, 100),
+                "Khách hàng", "Khách hàng đã đăng ký",
+                out accentActiveUser, out labelActiveUserTitle,
+                out labelActiveUserValue, out labelActiveUserDescription);
+
+            AddStatCard(cardAdmin,      0, 0, new Padding(0, 0, 16, 0), tablePeople);
+            AddStatCard(cardStaff,      1, 0, new Padding(0, 0, 16, 0), tablePeople);
+            AddStatCard(cardActiveUser, 2, 0, new Padding(0, 0,  0, 0), tablePeople);
 
             medicineManagementView.Dock = DockStyle.Fill;
             medicineManagementView.Location = new Point(28, 28);
@@ -231,13 +267,27 @@ namespace PharmacyManagementSystem
             employeeManagementView.TabIndex = 2;
             employeeManagementView.Visible = false;
 
+            invoiceHistoryView.Dock = DockStyle.Fill;
+            invoiceHistoryView.Location = new Point(28, 28);
+            invoiceHistoryView.Name = "invoiceHistoryView";
+            invoiceHistoryView.Size = new Size(876, 610);
+            invoiceHistoryView.TabIndex = 3;
+            invoiceHistoryView.Visible = false;
+
+            customerManagementView.Dock = DockStyle.Fill;
+            customerManagementView.Location = new Point(28, 28);
+            customerManagementView.Name = "customerManagementView";
+            customerManagementView.Size = new Size(876, 610);
+            customerManagementView.TabIndex = 5;
+            customerManagementView.Visible = false;
+
             panelPlaceholder.BackColor = Color.FromArgb(248, 249, 250);
             panelPlaceholder.Controls.Add(panelPlaceholderCard);
             panelPlaceholder.Dock = DockStyle.Fill;
             panelPlaceholder.Location = new Point(28, 28);
             panelPlaceholder.Name = "panelPlaceholder";
             panelPlaceholder.Size = new Size(876, 610);
-            panelPlaceholder.TabIndex = 3;
+            panelPlaceholder.TabIndex = 4;
             panelPlaceholder.Visible = false;
 
             panelPlaceholderCard.BackColor = Color.White;
@@ -285,17 +335,22 @@ namespace PharmacyManagementSystem
             panelHeader.PerformLayout();
             panelContent.ResumeLayout(false);
             panelDashboard.ResumeLayout(false);
-            tableStats.ResumeLayout(false);
+            tableMedicine.ResumeLayout(false);
+            tablePeople.ResumeLayout(false);
             cardTotalMedicine.ResumeLayout(false);
             cardTotalMedicine.PerformLayout();
             cardActiveMedicine.ResumeLayout(false);
             cardActiveMedicine.PerformLayout();
             cardStockQuantity.ResumeLayout(false);
             cardStockQuantity.PerformLayout();
-            cardLowStock.ResumeLayout(false);
-            cardLowStock.PerformLayout();
             cardExpiringSoon.ResumeLayout(false);
             cardExpiringSoon.PerformLayout();
+            cardLowStock.ResumeLayout(false);
+            cardLowStock.PerformLayout();
+            cardStopped.ResumeLayout(false);
+            cardStopped.PerformLayout();
+            cardExpired.ResumeLayout(false);
+            cardExpired.PerformLayout();
             cardAdmin.ResumeLayout(false);
             cardAdmin.PerformLayout();
             cardStaff.ResumeLayout(false);
@@ -327,24 +382,24 @@ namespace PharmacyManagementSystem
                 BorderRadius = 16,
                 BorderSize = 1,
                 Name = name,
-                Size = new Size(203, 214)
+                Size = new Size(203, 130)
             };
 
             accentPanel = new Panel
             {
                 BackColor = accentColor,
-                Location = new Point(22, 24),
+                Location = new Point(20, 12),
                 Name = $"accent{name}",
-                Size = new Size(44, 6),
+                Size = new Size(32, 5),
                 TabIndex = 0
             };
 
             titleLabel = new Label
             {
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point),
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = Color.FromArgb(51, 51, 51),
-                Location = new Point(22, 42),
+                Location = new Point(20, 24),
                 Name = $"label{name}Title",
                 TabIndex = 1,
                 Text = title
@@ -353,9 +408,9 @@ namespace PharmacyManagementSystem
             valueLabel = new Label
             {
                 AutoSize = true,
-                Font = new Font("Segoe UI", 26F, FontStyle.Bold, GraphicsUnit.Point),
+                Font = new Font("Segoe UI", 20F, FontStyle.Bold, GraphicsUnit.Point),
                 ForeColor = Color.FromArgb(51, 51, 51),
-                Location = new Point(20, 76),
+                Location = new Point(18, 46),
                 Name = $"label{name}Value",
                 TabIndex = 2,
                 Text = "0"
@@ -364,11 +419,11 @@ namespace PharmacyManagementSystem
             descriptionLabel = new Label
             {
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point),
-                ForeColor = Color.FromArgb(102, 102, 102),
-                Location = new Point(23, 240),
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Regular, GraphicsUnit.Point),
+                ForeColor = Color.FromArgb(130, 130, 130),
+                Location = new Point(20, 104),
                 Name = $"label{name}Description",
-                Size = new Size(152, 32),
+                Size = new Size(160, 18),
                 TabIndex = 3,
                 Text = description
             };
@@ -380,11 +435,11 @@ namespace PharmacyManagementSystem
             return card;
         }
 
-        private void AddStatCard(RoundedPanel card, int column, int row, Padding margin)
+        private static void AddStatCard(RoundedPanel card, int column, int row, Padding margin, TableLayoutPanel table)
         {
             card.Dock = DockStyle.Fill;
             card.Margin = margin;
-            tableStats.Controls.Add(card, column, row);
+            table.Controls.Add(card, column, row);
         }
 
         private SideNavigationMenu sideNavigationMenu;
@@ -394,9 +449,13 @@ namespace PharmacyManagementSystem
         private Label labelHeaderSubtitle;
         private Panel panelContent;
         private Panel panelDashboard;
-        private TableLayoutPanel tableStats;
+        private TableLayoutPanel tableMedicine;
+        private TableLayoutPanel tablePeople;
         private MedicineManagementView medicineManagementView;
         private EmployeeManagementView employeeManagementView;
+        private InvoiceHistoryView invoiceHistoryView;
+        private CustomerManagementView customerManagementView;
+        // Medicine cards
         private RoundedPanel cardTotalMedicine;
         private Panel accentTotalMedicine;
         private Label labelTotalMedicineTitle;
@@ -412,16 +471,27 @@ namespace PharmacyManagementSystem
         private Label labelStockQuantityTitle;
         private Label labelStockQuantityValue;
         private Label labelStockQuantityDescription;
-        private RoundedPanel cardLowStock;
-        private Panel accentLowStock;
-        private Label labelLowStockTitle;
-        private Label labelLowStockValue;
-        private Label labelLowStockDescription;
         private RoundedPanel cardExpiringSoon;
         private Panel accentExpiringSoon;
         private Label labelExpiringSoonTitle;
         private Label labelExpiringSoonValue;
         private Label labelExpiringSoonDescription;
+        private RoundedPanel cardLowStock;
+        private Panel accentLowStock;
+        private Label labelLowStockTitle;
+        private Label labelLowStockValue;
+        private Label labelLowStockDescription;
+        private RoundedPanel cardStopped;
+        private Panel accentStopped;
+        private Label labelStoppedTitle;
+        private Label labelStoppedValue;
+        private Label labelStoppedDescription;
+        private RoundedPanel cardExpired;
+        private Panel accentExpired;
+        private Label labelExpiredTitle;
+        private Label labelExpiredValue;
+        private Label labelExpiredDescription;
+        // People cards
         private RoundedPanel cardAdmin;
         private Panel accentAdmin;
         private Label labelAdminTitle;

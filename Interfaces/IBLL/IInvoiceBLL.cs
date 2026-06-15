@@ -7,5 +7,7 @@ public interface IInvoiceBLL
 {
     OperationResultDTO CreateInvoice(CreateInvoiceDTO request);
 
+    List<InvoiceDTO> GetInvoices(InvoiceQueryDTO query);
+
     List<InvoiceDTO> GetAll();
 }

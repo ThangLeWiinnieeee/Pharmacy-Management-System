@@ -14,7 +14,7 @@ namespace PharmacyManagementSystem;
 public class MedicinePickerDialog : Form
 {
     private static readonly CultureInfo Vi = CultureInfo.GetCultureInfo("vi-VN");
-    private const int FormW = 1060, FormH = 680, CardH = 550, LeftW = 560, RightW = 460;
+    private const int FormW = 1060, FormH = 692, CardH = 550, LeftW = 560, RightW = 460;
 
     private readonly IReadOnlyList<MedicineDTO> _medicines;
     private readonly List<InvoiceDetailInputDTO> _cartItems = [];
@@ -80,19 +80,27 @@ public class MedicinePickerDialog : Form
         {
             BorderColor = Color.FromArgb(170, 183, 196), BorderRadius = 9,
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
-            Location = new Point(14, 40), Size = new Size(LeftW - 28, 34)
+            Location = new Point(14, 40), Size = new Size(LeftW - 28, 34),
+            PlaceholderText = "Tên hoặc mã thuốc..."
         };
         _textSearch.TextChanged += (_, _) => ApplyFilter();
         cL.Controls.Add(_textSearch);
 
         _medicineGrid = MakeGrid(new Point(14, 84), new Size(LeftW - 28, 380), multiSelect: true, readOnly: false);
+        _medicineGrid.AllowUserToResizeColumns = false;
+        _medicineGrid.AllowUserToResizeRows    = false;
+        _medicineGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
         _medicineGrid.Columns.Add(new DataGridViewCheckBoxColumn
             { HeaderText = "", Name = "colCheck", Width = 36, AutoSizeMode = DataGridViewAutoSizeColumnMode.None, ReadOnly = false });
-        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Mã",          Name = "colCode",  FillWeight = 13, ReadOnly = true });
-        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tên thuốc",   Name = "colName",  FillWeight = 43, ReadOnly = true });
-        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "ĐVT",         Name = "colUnit",  FillWeight = 10, ReadOnly = true });
-        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tồn kho",     Name = "colStock", FillWeight = 12, ReadOnly = true });
+        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Mã",          Name = "colCode",  FillWeight = 12, ReadOnly = true });
+        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tên thuốc",   Name = "colName",  FillWeight = 35, ReadOnly = true });
+        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "ĐVT",         Name = "colUnit",  FillWeight = 9,  ReadOnly = true });
+        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tồn kho",     Name = "colStock", FillWeight = 11, ReadOnly = true });
         _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Giá bán (đ)", Name = "colPrice", FillWeight = 14, ReadOnly = true });
+        _medicineGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Trạng thái",  Name = "colStatus",FillWeight = 17, ReadOnly = true });
+        // Khóa sort để tránh thay đổi thứ tự bất ngờ
+        foreach (DataGridViewColumn col in _medicineGrid.Columns)
+            col.SortMode = DataGridViewColumnSortMode.NotSortable;
         _medicineGrid.SelectionChanged += OnMedSelChanged;
         _medicineGrid.CellContentClick += OnCheckboxClick;
         _medicineGrid.CellDoubleClick  += (_, e) => { if (e.ColumnIndex != _medicineGrid.Columns["colCheck"]!.Index) ToggleCheck(); };
@@ -119,6 +127,8 @@ public class MedicinePickerDialog : Form
 
         // Cart grid: cột SL được chỉnh inline
         _cartGrid = MakeGrid(new Point(14, 60), new Size(RightW - 28, 420), multiSelect: false, readOnly: false);
+        _cartGrid.AllowUserToResizeColumns = false;
+        _cartGrid.AllowUserToResizeRows    = false;
         _cartGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tên thuốc",      Name = "cName",  FillWeight = 42, ReadOnly = true });
         _cartGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tồn",            Name = "cStock", FillWeight = 16, ReadOnly = true });
         _cartGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "SL ✏",           Name = "cQty",   FillWeight = 14, ReadOnly = false });
@@ -139,6 +149,7 @@ public class MedicinePickerDialog : Form
         Controls.Add(header);
 
         LoadMedicineGrid(_medicines);
+        this.WireClickOutsideToBlur();
     }
 
     // ─── UI helpers ────────────────────────────────────────────────────────
@@ -204,15 +215,49 @@ public class MedicinePickerDialog : Form
         _medicineGrid.Rows.Clear();
         foreach (var m in list)
         {
-            bool inCart = _cartItems.Any(c => c.MedicineId == m.Id);
-            var idx = _medicineGrid.Rows.Add(inCart, m.Code, m.Name, m.Unit,
-                m.Quantity.ToString("N0", Vi), m.SellPrice.ToString("N0", Vi));
-            _medicineGrid.Rows[idx].Tag = m;
-            if (m.Quantity <= 0)
-                _medicineGrid.Rows[idx].DefaultCellStyle.ForeColor = Color.FromArgb(170, 170, 170);
+            bool inCart    = _cartItems.Any(c => c.MedicineId == m.Id);
+            var  status    = MedicineStatusHelper.Evaluate(m);
+            bool canSelect = status.CanOrder;
+
+            var idx = _medicineGrid.Rows.Add(
+                canSelect && inCart ? true : (object)(canSelect ? inCart : false),
+                m.Code, m.Name, m.Unit,
+                m.Quantity > 0 ? m.Quantity.ToString("N0", Vi) : "0",
+                m.SellPrice.ToString("N0", Vi),
+                status.Text);
+
+            var row = _medicineGrid.Rows[idx];
+            row.Tag = m;
+
+            // Màu chữ hàng — mờ nếu không thể đặt
+            row.DefaultCellStyle.ForeColor = canSelect
+                ? Color.FromArgb(51, 51, 51)
+                : Color.FromArgb(160, 150, 150);
+
+            row.Cells["colStatus"].Style.ForeColor = status.ForeColor;
+            row.Cells["colStatus"].Style.Font      = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+
+            // Tô màu cột hạn dùng
+            if (m.ExpiryDate.HasValue)
+            {
+                var diff = (m.ExpiryDate.Value.Date - DateTime.Today).TotalDays;
+                if (diff < 0)
+                    row.Cells["colPrice"].Style.ForeColor = Color.FromArgb(200, 200, 200); // giá mờ nếu hết hạn
+                // (không có cột ExpDate trong picker — bỏ qua)
+            }
+
+            // Vô hiệu hóa checkbox cho thuốc không thể chọn
+            if (!canSelect)
+            {
+                var chkCell = (DataGridViewCheckBoxCell)row.Cells["colCheck"];
+                chkCell.Value    = false;
+                chkCell.ReadOnly = true;
+                chkCell.Style.BackColor = Color.FromArgb(245, 245, 245);
+            }
         }
         RefreshAddButton();
     }
+
 
     private void ApplyFilter()
     {
@@ -254,7 +299,7 @@ public class MedicinePickerDialog : Form
     {
         _btnAddToCart.Enabled = _medicineGrid.Rows.Cast<DataGridViewRow>()
             .Any(r => Convert.ToBoolean(r.Cells["colCheck"].Value)
-                   && r.Tag is MedicineDTO m && m.Quantity > 0
+                   && r.Tag is MedicineDTO m && m.IsActive && m.Quantity > 0
                    && !_cartItems.Any(c => c.MedicineId == m.Id));
     }
 

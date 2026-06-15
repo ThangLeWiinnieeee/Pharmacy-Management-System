@@ -10,6 +10,7 @@ public partial class StaffHomeForm : Form
     {
         _currentUser = currentUser;
         InitializeComponent();
+        buttonInvoiceHistoryOpen.Click += HandleInvoiceHistoryClick;
         BindCurrentUser();
     }
 
@@ -33,6 +34,12 @@ public partial class StaffHomeForm : Form
     private void HandleCreateInvoiceClick(object? sender, EventArgs e)
     {
         using var form = new InvoiceEditorForm(_currentUser);
+        form.ShowDialog(this);
+    }
+
+    private void HandleInvoiceHistoryClick(object? sender, EventArgs e)
+    {
+        using var form = new InvoiceHistoryForm(_currentUser);
         form.ShowDialog(this);
     }
 

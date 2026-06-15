@@ -42,6 +42,37 @@ public class AuthPresenter
         _authBLL = authBLL;
     }
 
+    /// <summary>
+    /// Thử đăng nhập tự động bằng DPAPI token. Trả về true nếu thành công.
+    /// </summary>
+    public bool TryAutoLogin()
+    {
+        if (_loginView is null) return false;
+        var rawToken = RememberMeHelper.Load();
+        if (rawToken is null) return false;
+
+        var user = _authBLL.LoginWithToken(rawToken);
+        if (user is null)
+        {
+            RememberMeHelper.Clear(); // token hết hạn hoặc bị revoke
+            return false;
+        }
+
+        NavigateToDashboard(user);
+        return true;
+    }
+
+    /// <summary>
+    /// Revoke remember-me token và xóa file DPAPI (gọi khi logout).
+    /// </summary>
+    public void Logout()
+    {
+        var rawToken = RememberMeHelper.Load();
+        if (rawToken is not null)
+            _authBLL.RevokeRememberToken(rawToken);
+        RememberMeHelper.Clear();
+    }
+
     public void Login()
     {
         if (_loginView is null)
@@ -62,15 +93,33 @@ public class AuthPresenter
             return;
         }
 
-        if (string.Equals(result.User.Role, AdminRole, StringComparison.OrdinalIgnoreCase))
+        // Ghi nhớ đăng nhập nếu user chọn
+        if (_loginView.RememberMe)
         {
-            _loginView.OpenAdminDashboard(result.User);
+            try
+            {
+                var rawToken = _authBLL.CreateRememberToken(result.User.Id);
+                RememberMeHelper.Save(rawToken);
+            }
+            catch { /* không block login nếu lưu token thất bại */ }
+        }
+
+        NavigateToDashboard(result.User);
+    }
+
+    private void NavigateToDashboard(PharmacyManagementSystem.DTO.Output.UserDTO user)
+    {
+        if (_loginView is null) return;
+
+        if (string.Equals(user.Role, AdminRole, StringComparison.OrdinalIgnoreCase))
+        {
+            _loginView.OpenAdminDashboard(user);
             return;
         }
 
-        if (string.Equals(result.User.Role, StaffRole, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(user.Role, StaffRole, StringComparison.OrdinalIgnoreCase))
         {
-            _loginView.OpenStaffWorkspace(result.User);
+            _loginView.OpenStaffWorkspace(user);
             return;
         }
 

@@ -20,6 +20,7 @@ public class EmployeeEditorForm : Form
 
         InitializeForm();
         BindCurrentEmployee();
+        this.WireClickOutsideToBlur();
     }
 
     public SaveEmployeeDTO? EmployeeInput { get; private set; }

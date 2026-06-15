@@ -24,6 +24,7 @@ public class MedicineEditorForm : Form
 
         InitializeForm();
         BindCurrentMedicine();
+        this.WireClickOutsideToBlur();
     }
 
     public SaveMedicineDTO? MedicineInput { get; private set; }

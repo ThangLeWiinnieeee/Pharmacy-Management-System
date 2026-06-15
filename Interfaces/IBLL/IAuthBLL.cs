@@ -8,4 +8,10 @@ public interface IAuthBLL
     LoginResultDTO Login(LoginUserDTO request);
 
     RegisterResultDTO Register(RegisterUserDTO request);
+
+    UserDTO? LoginWithToken(string rawToken);
+
+    string CreateRememberToken(int userId);
+
+    void RevokeRememberToken(string rawToken);
 }

@@ -1,8 +1,8 @@
 using PharmacyManagementSystem.DTO.Output;
 
-namespace PharmacyManagementSystem.Interfaces.IDAL;
+namespace PharmacyManagementSystem.Interfaces.IBLL;
 
-public interface ICustomerDAL
+public interface ICustomerBLL
 {
     CustomerLookupDTO? LookupByPhone(string phone);
     void CreateCustomer(string name, string phone, string? address);

@@ -23,6 +23,7 @@ namespace PharmacyManagementSystem
             set
             {
                 _borderRadius = Math.Max(0, value);
+                UpdateRegion();
                 Invalidate();
             }
         }
@@ -49,6 +50,18 @@ namespace PharmacyManagementSystem
             }
         }
 
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            UpdateRegion();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            UpdateRegion();
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             var bounds = ClientRectangle;
@@ -62,7 +75,6 @@ namespace PharmacyManagementSystem
             e.Graphics.Clear(Parent?.BackColor ?? SystemColors.Control);
 
             using var path = CreateRoundPath(bounds, BorderRadius);
-            Region = new Region(path);
 
             using var fillBrush = new SolidBrush(BackColor);
             e.Graphics.FillPath(fillBrush, path);
@@ -76,6 +88,18 @@ namespace PharmacyManagementSystem
             }
 
             base.OnPaint(e);
+        }
+
+        private void UpdateRegion()
+        {
+            var bounds = ClientRectangle;
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+            {
+                Region = null;
+                return;
+            }
+            using var path = CreateRoundPath(bounds, BorderRadius);
+            Region = new Region(path);
         }
 
         private static GraphicsPath CreateRoundPath(Rectangle bounds, int radius)

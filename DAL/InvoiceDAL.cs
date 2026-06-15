@@ -67,14 +67,45 @@ public class InvoiceDAL : IInvoiceDAL
         return MapToDTO(invoice, context);
     }
 
-    public List<InvoiceDTO> GetAll()
+    public List<InvoiceDTO> GetInvoices(InvoiceQueryDTO query)
     {
         using var context = new AppDbContext();
 
-        return context.Invoices
+        var invoicesQuery = context.Invoices
             .AsNoTracking()
             .Include(i => i.Details)
             .Include(i => i.CreatedByUser)
+            .AsQueryable();
+
+        var keyword = query.Keyword.Trim();
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            invoicesQuery = invoicesQuery.Where(i =>
+                i.InvoiceCode.Contains(keyword) ||
+                (i.CustomerName != null && i.CustomerName.Contains(keyword)) ||
+                (i.CustomerPhone != null && i.CustomerPhone.Contains(keyword)) ||
+                (i.CreatedByUser != null && i.CreatedByUser.FullName.Contains(keyword)));
+        }
+
+        if (query.DateFrom.HasValue)
+        {
+            var dateFrom = query.DateFrom.Value.Date;
+            invoicesQuery = invoicesQuery.Where(i => i.CreatedAt >= dateFrom);
+        }
+
+        if (query.DateTo.HasValue)
+        {
+            var dateToExclusive = query.DateTo.Value.Date.AddDays(1);
+            invoicesQuery = invoicesQuery.Where(i => i.CreatedAt < dateToExclusive);
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.StatusFilter) && query.StatusFilter != "Tất cả")
+        {
+            var status = query.StatusFilter.Trim();
+            invoicesQuery = invoicesQuery.Where(i => i.Status == status);
+        }
+
+        return invoicesQuery
             .OrderByDescending(i => i.CreatedAt)
             .Select(i => new InvoiceDTO
             {
@@ -102,6 +133,11 @@ public class InvoiceDAL : IInvoiceDAL
                 }).ToList()
             })
             .ToList();
+    }
+
+    public List<InvoiceDTO> GetAll()
+    {
+        return GetInvoices(new InvoiceQueryDTO());
     }
 
     private static InvoiceDTO MapToDTO(Invoice invoice, AppDbContext context)

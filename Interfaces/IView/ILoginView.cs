@@ -8,6 +8,8 @@ public interface ILoginView
 
     string Password { get; }
 
+    bool RememberMe { get; }
+
     void ShowLoginError(string message);
 
     void OpenAdminDashboard(UserDTO user);
