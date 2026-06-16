@@ -1,149 +1,140 @@
-# PharmacyManagementSystem
+# Pharmacy Management System
 
-Ung dung desktop Windows Forms de quan ly nha thuoc. Project su dung kien truc 3-layer ket hop MVP:
+Ứng dụng desktop quản lý nhà thuốc xây dựng trên **Windows Forms (.NET 8)**. Hỗ trợ hai vai trò Admin và Staff với đầy đủ luồng bán hàng: quản lý thuốc, lập hóa đơn, tra cứu khách hàng và thống kê tổng quan.
 
-```text
-GUI -> Presenter -> BLL -> DAL -> Database
-```
+---
+
+## Tính Năng
+
+- **Xác thực** — Đăng nhập, đăng ký, ghi nhớ đăng nhập tự động (PBKDF2-SHA256 + DPAPI)
+- **Phân quyền** — Admin có toàn quyền; Staff chỉ truy cập khu vực bán hàng
+- **Dashboard** — Thống kê thuốc, tồn kho, cảnh báo sắp hết / sắp hết hạn, số lượng nhân viên và khách hàng
+- **Quản lý thuốc** — Thêm, sửa, ngừng kinh doanh, lọc theo trạng thái, xem lịch sử lô hàng nhập
+- **Quản lý nhân viên** — Thêm, sửa, khóa / mở khóa tài khoản, lọc theo vai trò và trạng thái
+- **Quản lý khách hàng** — Thêm, sửa, xóa, tra cứu lịch sử mua hàng theo số điện thoại
+- **Lập hóa đơn** — Tra cứu khách theo SĐT, thêm thuốc vào giỏ, chiết khấu, tự sinh mã hóa đơn, trừ tồn kho tự động
+- **Lịch sử hóa đơn** — Tìm kiếm, lọc theo trạng thái và khoảng ngày, xem chi tiết từng hóa đơn
+
+---
 
 ## Tech Stack
 
-- .NET 8 (`net8.0-windows`)
-- Windows Forms
-- Entity Framework Core SQL Server 8
-- SQL Server
-- `System.Configuration.ConfigurationManager` de doc connection string tu `App.config`
+| Thành phần | Công nghệ |
+|-----------|-----------|
+| UI | Windows Forms (.NET 8) |
+| ORM | Entity Framework Core 8 (SQL Server) |
+| Database | SQL Server (LocalDB / Express / Developer) |
+| Mật khẩu | PBKDF2-SHA256, 100.000 iterations |
+| Remember Me | Token ngẫu nhiên + DPAPI (CurrentUser) |
+| Cấu hình | `System.Configuration` — `App.config` |
 
-## Yeu Cau
+---
 
-- Windows
-- .NET SDK 8
-- SQL Server LocalDB/Express/Developer hoac SQL Server tuong duong
-- Visual Studio hoac CLI `dotnet`
+## Yêu Cầu
 
-## Cai Dat
+- Windows 10/11
+- [.NET SDK 8](https://dotnet.microsoft.com/download/dotnet/8.0)
+- SQL Server (LocalDB, Express, Developer hoặc tương đương)
+- Visual Studio 2022+ hoặc CLI `dotnet`
 
-1. Mo solution `PharmacyManagementSystem.slnx`.
-2. Tao database `PharmacyManagementSystemDb` trong SQL Server.
-3. Chay cac script trong folder `SQL_Database/`:
-   - `User.sql`
-   - `Medicines.sql`
-4. Tao file `PharmacyManagementSystem/App.config` tu file mau `PharmacyManagementSystem/App.config.example`.
-5. Sua connection string `PharmacyDb` trong `App.config` cho dung SQL Server tren may dang chay.
-6. Restore NuGet packages neu IDE chua tu dong restore.
+---
 
-`App.config` la cau hinh cuc bo. Khong dua connection string that, ten may noi bo, tai khoan hoac mat khau vao repository.
+## Getting Started
 
-## Chay Du An
+### 1. Clone & mở solution
 
-### Visual Studio
+```bash
+git clone <repo-url>
+```
 
-1. Mo `PharmacyManagementSystem.slnx`.
-2. Set project `PharmacyManagementSystem` lam startup project.
-3. Chay bang F5.
+Mở `PharmacyManagementSystem.slnx` bằng Visual Studio.
 
-### CLI
+### 2. Tạo database
 
-Tu thu muc goc solution:
+Tạo database `PharmacyManagementSystemDb` trong SQL Server, sau đó chạy các script trong `SQL_Database/` **theo đúng thứ tự**:
+
+```
+1. User.sql
+2. Medicines.sql
+3. Customers.sql
+4. Invoices.sql
+5. RememberMeTokens.sql
+6. SeedData.sql
+7. MedicineBatches.sql        ← phải chạy sau SeedData.sql
+```
+
+### 3. Cấu hình connection string
+
+Sao chép file mẫu rồi chỉnh lại tên server:
+
+```bash
+cp PharmacyManagementSystem/App.config.example PharmacyManagementSystem/App.config
+```
+
+Sửa giá trị `Data Source` trong `App.config` cho khớp với SQL Server trên máy.
+
+> `App.config` là file cục bộ — không commit vào repository.
+
+### 4. Chạy ứng dụng
+
+**Visual Studio:** nhấn `F5`.
+
+**CLI:**
 
 ```powershell
-dotnet build PharmacyManagementSystem/PharmacyManagementSystem.csproj
 dotnet run --project PharmacyManagementSystem/PharmacyManagementSystem.csproj
 ```
 
-Hoac tu thu muc project con `PharmacyManagementSystem/`:
+### Tài Khoản Test
 
-```powershell
-dotnet build
-dotnet run
+| Username | Mật khẩu | Vai trò | Trạng thái |
+|----------|-----------|---------|------------|
+| `admin` | `Admin@123` | Admin | Hoạt động |
+| `nhanvien01` | `Staff@123` | Staff | Hoạt động |
+| `nhanvien02` | `Staff@123` | Staff | Hoạt động |
+| `nhanvien_off` | `Staff@123` | Staff | Bị khóa |
+
+---
+
+## Cấu Trúc Dự Án
+
 ```
-
-## Cau Truc Chinh
-
-```text
 PharmacyManagementSystem/
-|-- PharmacyManagementSystem.slnx
-|-- AGENTS.md
-|-- SQL_Database/
-|   |-- User.sql
-|   `-- Medicines.sql
-`-- PharmacyManagementSystem/
-    |-- Program.cs
-    |-- App.config.example
-    |-- GUI/            # Windows Forms views, dialogs, admin shell
-    |   `-- Controls/   # Custom controls
-    |-- Presenters/     # Presenter layer
-    |-- BLL/            # Business logic
-    |   `-- Validations/
-    |-- DAL/            # EF Core data access
-    |-- Interfaces/
-    |   |-- IBLL/
-    |   |-- IDAL/
-    |   `-- IView/
-    |-- DTO/
-    |   |-- Input/
-    |   `-- Output/
-    `-- Entities/
+├── PharmacyManagementSystem.slnx
+├── SQL_Database/               # Script tạo bảng và dữ liệu mẫu
+└── PharmacyManagementSystem/
+    ├── Program.cs
+    ├── App.config.example
+    ├── Entities/               # EF Core entities
+    ├── DTO/
+    │   ├── Input/
+    │   └── Output/
+    ├── Interfaces/
+    │   ├── IBLL/
+    │   ├── IDAL/
+    │   └── IView/
+    ├── DAL/                    # Data Access Layer (EF Core + LINQ)
+    ├── BLL/                    # Business Logic + Validations
+    │   └── Validations/
+    ├── Presenters/             # MVP Presenter layer
+    └── GUI/                    # Windows Forms views & dialogs
+        └── Controls/           # Custom controls
 ```
 
-## Chuc Nang Hien Tai
+---
 
-| Chuc nang | Trang thai |
-|-----------|------------|
-| Dang nhap/Dang ky | Co validate input, hash mat khau PBKDF2, kiem tra trang thai tai khoan |
-| Phan quyen | Dieu huong `Admin` vao dashboard, `Staff` vao khu vuc lam viec rieng |
-| Dashboard Admin | Hien thong ke tong quan ve thuoc, ton kho va tai khoan |
-| Side Navigation Admin | Dieu huong giua dashboard, quan ly thuoc, quan ly nhan vien va cac muc se phat trien tiep |
-| Quan ly thuoc | Xem danh sach, tim kiem, loc trang thai, them, sua, ngung kinh doanh |
-| Quan ly nhan vien | Xem danh sach, tim kiem, loc vai tro/trang thai, them, sua, khoa/mo khoa tai khoan |
-| Khu vuc Staff | Man hinh lam viec co ban cho nhan vien |
-| Database check | Kiem tra ket noi database khi khoi dong app |
+## Kiến Trúc
 
-## Luong Chay
+Project theo kiến trúc **3-layer kết hợp MVP**:
 
-1. App chay tu `Program.cs`.
-2. `DatabaseInitializer` kiem tra ket noi database.
-3. Neu ket noi thanh cong, app mo `LoginForm`.
-4. Nguoi dung dang nhap hoac mo `RegisterForm` de dang ky.
-5. Tai khoan dang ky moi mac dinh role `Staff`.
-6. Dang nhap thanh cong se dieu huong theo role:
-   - `Admin` mo `MainForm`
-   - `Staff` mo `StaffHomeForm`
-7. Nut dang xuat dong man hinh hien tai va hien lai `LoginForm`.
-
-## Database
-
-`AppDbContext` hien co:
-
-- `DbSet<User>` mapping bang `Users`
-- `DbSet<Medicine>` mapping bang `Medicines`
-
-Project hien chua dung EF Core migration. Schema database duoc tao/cap nhat thu cong bang SQL script trong `SQL_Database/`.
-
-## Quy Uoc Chinh
-
-- GUI chi xu ly UI, doc input, bind data va goi Presenter.
-- Presenter dieu phoi giua View va BLL.
-- BLL chua nghiep vu, validation va goi DAL qua interface.
-- DAL truy xuat du lieu bang EF/LINQ.
-- DTO dung de truyen du lieu giua cac tang.
-- Entity dung cho EF Core/database mapping.
-- Role hien tai gom `Admin` va `Staff`.
-- Mat khau khong luu plain text; he thong dung PBKDF2.
-
-## Trang Thai Chua Hoan Thien
-
-- Chua co EF Core migration.
-- Chua co report/RDLC.
-- Chua co module day du cho hoa don, chi tiet hoa don va khach hang.
-- Quan ly thuoc va nhan vien moi o muc co ban; chua co phan trang, export/import, audit log, phan quyen chi tiet.
-
-## Ghi Chu
-
-- Xem quy tac lam viec danh cho AI/developer trong `AGENTS.md`.
-- Neu app khong khoi dong duoc, kiem tra `App.config`, database `PharmacyManagementSystemDb` va cac bang `Users`, `Medicines`.
-- Sau khi sua code, nen chay:
-
-```powershell
-dotnet build PharmacyManagementSystem/PharmacyManagementSystem.csproj
 ```
+GUI (View)  →  Presenter  →  BLL  →  DAL  →  SQL Server
+```
+
+- **GUI** chỉ xử lý hiển thị, đọc input và gọi Presenter.
+- **Presenter** điều phối luồng dữ liệu giữa View và BLL.
+- **BLL** chứa nghiệp vụ và validation, gọi DAL qua interface.
+- **DAL** truy xuất dữ liệu bằng EF Core / LINQ.
+- **DTO** truyền dữ liệu giữa các tầng; **Entity** dùng cho EF mapping.
+
+Schema database được quản lý thủ công bằng SQL script (chưa dùng EF Core migration).
