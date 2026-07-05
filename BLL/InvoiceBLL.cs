@@ -40,6 +40,11 @@ public class InvoiceBLL : IInvoiceBLL
             return OperationResultDTO.Failure("Giảm giá không được âm.");
         }
 
+        if (request.PointsUsed < 0)
+        {
+            return OperationResultDTO.Failure("Số điểm sử dụng không được âm.");
+        }
+
         var total = request.Details.Sum(d => d.LineTotal);
         if (request.Discount > total)
         {
@@ -49,7 +54,18 @@ public class InvoiceBLL : IInvoiceBLL
         try
         {
             var invoice = _invoiceDAL.Create(request);
-            return OperationResultDTO.Success($"Lập hóa đơn thành công. Mã hóa đơn: {invoice.InvoiceCode}");
+
+            var message = $"Lập hóa đơn thành công. Mã hóa đơn: {invoice.InvoiceCode}";
+            if (invoice.PointsUsed > 0)
+            {
+                message += $"\nĐã trừ {invoice.PointsUsed:N0} điểm ({invoice.PointsUsed:N0} đ).";
+            }
+            if (invoice.PointsEarned > 0)
+            {
+                message += $"\nKhách được cộng {invoice.PointsEarned:N0} điểm.";
+            }
+
+            return OperationResultDTO.Success(message, invoice.InvoiceCode);
         }
         catch
         {

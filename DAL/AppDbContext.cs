@@ -7,8 +7,11 @@ namespace PharmacyManagementSystem.DAL;
 public class AppDbContext : DbContext
 {
     private const string ConnectionStringName = "PharmacyDb";
+    private const string EnvVarName = "PHARMACY_DB";
+
+    // Fallback chỉ dùng khi không có env var và không có App.config (không chứa mật khẩu thật).
     private const string DefaultConnectionString =
-        @"Data Source=DESKTOP-S0CA04B;Initial Catalog=PharmacyManagementSystemDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
+        "Host=localhost;Port=5432;Database=pharmacy;Username=postgres;Password=postgres";
 
     public AppDbContext()
     {
@@ -40,14 +43,21 @@ public class AppDbContext : DbContext
             return;
         }
 
-        var connectionString = ConfigurationManager.ConnectionStrings[ConnectionStringName]?.ConnectionString;
+        // Ưu tiên biến môi trường (để mật khẩu Supabase không nằm trong source/git),
+        // sau đó tới App.config, cuối cùng là fallback localhost.
+        var connectionString = Environment.GetEnvironmentVariable(EnvVarName);
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            connectionString = ConfigurationManager.ConnectionStrings[ConnectionStringName]?.ConnectionString;
+        }
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             connectionString = DefaultConnectionString;
         }
 
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseNpgsql(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -98,7 +108,7 @@ public class AppDbContext : DbContext
             .HasDefaultValue(true);
 
         user.Property(item => item.CreatedAt)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("NOW()");
 
         user.Property(item => item.UpdatedAt);
     }
@@ -142,7 +152,7 @@ public class AppDbContext : DbContext
             .HasDefaultValue(true);
 
         medicine.Property(item => item.CreatedAt)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("NOW()");
     }
 
     private static void ConfigureMedicineBatch(ModelBuilder modelBuilder)
@@ -153,7 +163,7 @@ public class AppDbContext : DbContext
         batch.HasKey(b => b.Id);
 
         batch.Property(b => b.ImportDate)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("NOW()");
 
         batch.Property(b => b.ImportQuantity)
             .HasDefaultValue(0);
@@ -188,8 +198,11 @@ public class AppDbContext : DbContext
         customer.Property(c => c.Address)
             .HasMaxLength(250);
 
+        customer.Property(c => c.Points)
+            .HasDefaultValue(0);
+
         customer.Property(c => c.CreatedAt)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("NOW()");
     }
 
     private static void ConfigureInvoice(ModelBuilder modelBuilder)
@@ -222,6 +235,12 @@ public class AppDbContext : DbContext
             .HasPrecision(18, 2)
             .HasDefaultValue(0m);
 
+        invoice.Property(i => i.PointsEarned)
+            .HasDefaultValue(0);
+
+        invoice.Property(i => i.PointsUsed)
+            .HasDefaultValue(0);
+
         invoice.Property(i => i.Note)
             .HasMaxLength(500);
 
@@ -231,7 +250,7 @@ public class AppDbContext : DbContext
             .IsRequired();
 
         invoice.Property(i => i.CreatedAt)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("NOW()");
 
         invoice.HasOne(i => i.Customer)
             .WithMany(c => c.Invoices)
@@ -251,7 +270,7 @@ public class AppDbContext : DbContext
         token.HasKey(t => t.Id);
         token.Property(t => t.TokenHash).HasMaxLength(64).IsRequired();
         token.Property(t => t.ExpiresAt).IsRequired();
-        token.Property(t => t.CreatedAt).HasDefaultValueSql("GETDATE()");
+        token.Property(t => t.CreatedAt).HasDefaultValueSql("NOW()");
         token.HasIndex(t => t.TokenHash);
         token.HasOne(t => t.User)
             .WithMany()

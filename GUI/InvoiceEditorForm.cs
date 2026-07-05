@@ -10,9 +10,11 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
 {
     private readonly InvoicePresenter _presenter;
     private readonly List<InvoiceDetailInputDTO> _cartItems = [];
+    private readonly string _staffName;
 
     // Header
     private Label _labelInvoiceCode = null!;
+    private string _provisionalCode = string.Empty;
 
     // Customer lookup state
     private enum CustomerState { None, Found, NotFound }
@@ -31,9 +33,12 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
 
     // Totals
     private Label _labelTotal = null!;
-    private Label _labelDiscount = null!;
     private Label _labelFinal = null!;
-    private NumericUpDown _numDiscount = null!;
+
+    // Điểm tích lũy
+    private NumericUpDown _numPoints = null!;
+    private Label _labelPointsAvailable = null!;
+    private Label _labelPointsDeduct = null!;
 
     // Note
     private RoundedTextBox _textNote = null!;
@@ -41,13 +46,15 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
     // Buttons
     private RoundedButton _buttonAddMedicine = null!;
     private RoundedButton _buttonRemoveItem = null!;
-    private RoundedButton _buttonSave = null!;
+    private RoundedButton _buttonSave = null!;   // "Thanh toán"
+    private RoundedButton _buttonPrint = null!;  // "In hóa đơn" (chưa thanh toán)
     private RoundedButton _buttonCancel = null!;
 
     private static readonly CultureInfo Vi = CultureInfo.GetCultureInfo("vi-VN");
 
     public InvoiceEditorForm(UserDTO currentUser)
     {
+        _staffName = currentUser.FullName;
         InitializeLayout(currentUser.FullName);
         _presenter = new InvoicePresenter(this, currentUser.Id);
 
@@ -73,17 +80,9 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
         // Cart / totals events
         _buttonAddMedicine.Click += (_, _) => _presenter.AddMedicineToCart();
         _buttonRemoveItem.Click += (_, _) => RemoveSelectedCartItem();
-        _numDiscount.ValueChanged += (_, _) => _presenter.RefreshTotals();
-        _numDiscount.Leave += (_, _) =>
-        {
-            var text = _numDiscount.Text.Replace(",", "").Replace(".", "").Trim();
-            if (!decimal.TryParse(text, out var parsed) || parsed < 0)
-            {
-                _numDiscount.Value = 0;
-                _presenter.RefreshTotals();
-            }
-        };
-        _buttonSave.Click += (_, _) => _presenter.SaveInvoice();
+        _numPoints.ValueChanged += (_, _) => _presenter.RefreshTotals();
+        _buttonSave.Click += (_, _) => _presenter.Checkout();
+        _buttonPrint.Click += (_, _) => PrintUnpaid();
         _buttonCancel.Click += (_, _) => { DialogResult = DialogResult.Cancel; Close(); };
 
         _presenter.RefreshTotals();
@@ -94,7 +93,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
 
     public string CustomerName => _resolvedCustomerName;
     public string CustomerPhone => _textCustomerPhone.Text.Trim();
-    public decimal Discount => _numDiscount.Value;
+    public int PointsUsed => (int)_numPoints.Value;
     public string Note => _textNote.Text.Trim();
     public IReadOnlyList<InvoiceDetailInputDTO> CartItems => _cartItems.AsReadOnly();
 
@@ -119,6 +118,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
         _labelCustomerStatus.Text = $"✓  {customer.Name}{historyText}";
         _labelCustomerStatus.ForeColor = Color.FromArgb(25, 135, 84);
 
+        SetAvailablePoints(customer.Points);
+
         _buttonEditCustomer.Visible = true;
 
         _buttonCustomerAction.Text = "Đặt lại";
@@ -135,6 +136,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
         _labelCustomerStatus.Text = "Chưa có trong hệ thống";
         _labelCustomerStatus.ForeColor = Color.FromArgb(200, 110, 0);
 
+        SetAvailablePoints(0);
+
         _buttonEditCustomer.Visible = false;
 
         _buttonCustomerAction.Text = "Tạo mới";
@@ -149,26 +152,95 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
         _customerState = CustomerState.None;
         _labelCustomerStatus.Text = "Nhập SĐT rồi nhấn Tìm hoặc Enter";
         _labelCustomerStatus.ForeColor = Color.FromArgb(150, 150, 150);
+        SetAvailablePoints(0);
         _buttonEditCustomer.Visible = false;
         _buttonCustomerAction.Visible = false;
     }
 
     public void ResetForm(string newInvoiceCode)
     {
+        _provisionalCode = newInvoiceCode;
         _labelInvoiceCode.Text = $"Mã hóa đơn: {newInvoiceCode}";
         _textCustomerPhone.Text = string.Empty;
         ClearCustomerStatus();
-        _numDiscount.Value = 0;
         _textNote.Text = string.Empty;
         _cartItems.Clear();
         RefreshCartGrid();
     }
 
-    public void RefreshTotals(decimal total, decimal discount, decimal finalAmount)
+    public void SetActionsEnabled(bool enabled)
+    {
+        _buttonSave.Enabled = enabled;
+        _buttonPrint.Enabled = enabled;
+    }
+
+    /// <summary>Mở popup tổng kết thanh toán; nếu popup đã lưu hóa đơn thì reset form.</summary>
+    public void OpenPaymentSummary()
+    {
+        var (total, pointsUsed, final) = ComputeTotals();
+
+        using var dialog = new PaymentSummaryDialog(
+            () => _presenter.PersistInvoice(),
+            _provisionalCode, _staffName, _resolvedCustomerName, _textCustomerPhone.Text.Trim(),
+            _cartItems.ToList(), total, pointsUsed, final);
+        dialog.ShowDialog(this);
+
+        if (dialog.WasSaved)
+        {
+            var newCode = "HD" + DateTime.Now.ToString("yyMMddHHmmss");
+            ResetForm(newCode);
+        }
+    }
+
+    /// <summary>In hóa đơn khi CHƯA thanh toán: hiện số tiền cần trả = thành tiền.</summary>
+    private void PrintUnpaid()
+    {
+        if (_cartItems.Count == 0)
+        {
+            ShowError("Chưa có thuốc nào trong hóa đơn để in.");
+            return;
+        }
+
+        var (total, pointsUsed, final) = ComputeTotals();
+
+        using var doc = new InvoiceReceiptDocument(
+            _provisionalCode, DateTime.Now, _staffName, _resolvedCustomerName, _textCustomerPhone.Text.Trim(),
+            _cartItems.ToList(), total, 0m, pointsUsed, final, paid: false);
+
+        using var preview = new PrintPreviewDialog
+        {
+            Document = doc,
+            WindowState = FormWindowState.Maximized
+        };
+        preview.ShowDialog(this);
+    }
+
+    /// <summary>Tính tổng tiền, điểm dùng (đã kẹp), và thành tiền từ giỏ hàng hiện tại.</summary>
+    private (decimal Total, int PointsUsed, decimal Final) ComputeTotals()
+    {
+        var total = _cartItems.Sum(i => i.LineTotal);
+        var pointsUsed = (int)_numPoints.Value;
+        if (pointsUsed > total) pointsUsed = (int)total;
+        if (pointsUsed < 0) pointsUsed = 0;
+        var final = total - pointsUsed;
+        if (final < 0) final = 0;
+        return (total, pointsUsed, final);
+    }
+
+    public void RefreshTotals(decimal total, int pointsUsed, decimal finalAmount)
     {
         _labelTotal.Text = $"Tổng tiền hàng: {total:N0} đ";
-        _labelDiscount.Text = $"Giảm giá: {discount:N0} đ";
+        _labelPointsDeduct.Text = $"Trừ điểm: {pointsUsed:N0} đ";
         _labelFinal.Text = $"{finalAmount:N0} đ";
+    }
+
+    /// <summary>Cập nhật số điểm khả dụng và giới hạn ô nhập điểm</summary>
+    private void SetAvailablePoints(int points)
+    {
+        if (points < 0) points = 0;
+        _numPoints.Value = 0;
+        _numPoints.Maximum = points;
+        _labelPointsAvailable.Text = $"Điểm hiện có: {points:N0}";
     }
 
     public IReadOnlyList<InvoiceDetailInputDTO>? RequestSelectMedicines()
@@ -263,7 +335,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
     private void InitializeLayout(string staffName)
     {
         Text = "Lập hóa đơn";
-        ClientSize = new Size(1020, 700);
+        ClientSize = new Size(1080, 830);
         StartPosition = FormStartPosition.CenterParent;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -289,6 +361,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
         };
 
         var newCode = "HD" + DateTime.Now.ToString("yyMMddHHmmss");
+        _provisionalCode = newCode;
         _labelInvoiceCode = new Label
         {
             AutoSize = true,
@@ -304,8 +377,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             AutoEllipsis = true,
             Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(180, 215, 255),
-            Location = new Point(672, 26),
-            Size = new Size(220, 22),
+            Location = new Point(700, 26),
+            Size = new Size(240, 22),
             TextAlign = ContentAlignment.MiddleRight,
             Text = $"Nhân viên: {staffName}"
         };
@@ -320,7 +393,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(0, 86, 179),
             HoverBackColor = Color.FromArgb(224, 239, 255),
-            Location = new Point(900, 20),
+            Location = new Point(962, 20),
             Size = new Size(90, 34),
             Text = "Đóng"
         };
@@ -343,8 +416,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             BorderColor = Color.FromArgb(224, 229, 235),
             BorderRadius = 14,
             BorderSize = 1,
-            Location = new Point(24, 20),
-            Size = new Size(480, 130),
+            Location = new Point(28, 24),
+            Size = new Size(502, 150),
             Padding = new Padding(20, 14, 20, 14)
         };
 
@@ -443,8 +516,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             BorderColor = Color.FromArgb(224, 229, 235),
             BorderRadius = 14,
             BorderSize = 1,
-            Location = new Point(516, 20),
-            Size = new Size(480, 130),
+            Location = new Point(550, 24),
+            Size = new Size(502, 150),
             Padding = new Padding(20, 14, 20, 14)
         };
 
@@ -463,7 +536,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             BorderRadius = 8,
             Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point),
             Location = new Point(20, 44),
-            Size = new Size(440, 52)
+            Size = new Size(462, 74)
         };
 
         cardNote.Controls.AddRange([labelNoteTitle, _textNote]);
@@ -475,8 +548,8 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             BorderColor = Color.FromArgb(224, 229, 235),
             BorderRadius = 14,
             BorderSize = 1,
-            Location = new Point(24, 158),
-            Size = new Size(972, 340),
+            Location = new Point(28, 194),
+            Size = new Size(1024, 340),
             Padding = new Padding(16)
         };
 
@@ -498,7 +571,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.White,
             HoverBackColor = Color.FromArgb(0, 113, 235),
-            Location = new Point(750, 10),
+            Location = new Point(796, 10),
             Size = new Size(120, 34),
             Text = "+ Thêm thuốc"
         };
@@ -513,7 +586,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             Font = new Font("Segoe UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.White,
             HoverBackColor = Color.FromArgb(200, 43, 58),
-            Location = new Point(880, 10),
+            Location = new Point(928, 10),
             Size = new Size(80, 34),
             Text = "Xóa dòng"
         };
@@ -538,7 +611,7 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             RowHeadersVisible = false,
             RowTemplate = { Height = 36 },
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            Size = new Size(940, 266)
+            Size = new Size(992, 270)
         };
 
         _cartGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Mã thuốc", Name = "colCode", FillWeight = 12, ReadOnly = true });
@@ -561,9 +634,9 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             BorderColor = Color.FromArgb(224, 229, 235),
             BorderRadius = 14,
             BorderSize = 1,
-            Location = new Point(24, 506),
-            Size = new Size(972, 118),
-            Padding = new Padding(24, 12, 24, 12)
+            Location = new Point(28, 554),
+            Size = new Size(1024, 180),
+            Padding = new Padding(28, 16, 28, 16)
         };
 
         // Hàng 1: tổng phụ + giảm giá
@@ -572,57 +645,82 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(80, 80, 80),
-            Location = new Point(20, 14),
+            Location = new Point(28, 22),
             Text = "Tổng tiền hàng: 0 đ"
         };
 
-        var labelDiscountLbl = new Label
+        // Hàng 2: điểm tích lũy (1 điểm = 1đ) — cách giảm giá duy nhất
+        _labelPointsAvailable = new Label
         {
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(80, 80, 80),
-            Location = new Point(264, 14),
-            Text = "Giảm giá (đ):"
+            Location = new Point(28, 68),
+            Text = "Điểm hiện có: 0"
         };
 
-        _numDiscount = new NumericUpDown
+        var labelPointsLbl = new Label
+        {
+            AutoSize = true,
+            Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
+            ForeColor = Color.FromArgb(80, 80, 80),
+            Location = new Point(330, 68),
+            Text = "Dùng điểm (đ):"
+        };
+
+        _numPoints = new NumericUpDown
         {
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
-            Location = new Point(370, 10),
-            Maximum = 999_999_999,
+            Location = new Point(440, 64),
+            Maximum = 0,
             Minimum = 0,
-            Size = new Size(128, 28),
+            Size = new Size(140, 28),
             ThousandsSeparator = true,
             Value = 0
         };
 
-        _labelDiscount = new Label
+        _labelPointsDeduct = new Label
         {
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(220, 53, 69),
-            Location = new Point(508, 14),
-            Text = "Giảm giá: 0 đ"
+            Location = new Point(620, 68),
+            Text = "Trừ điểm: 0 đ"
         };
 
-        // Hàng 2: thanh toán + nút lưu
+        // Hàng 3: thanh toán + nút lưu
         var labelFinalLbl = new Label
         {
             AutoSize = true,
-            Font = new Font("Segoe UI", 10.5F, FontStyle.Bold, GraphicsUnit.Point),
+            Font = new Font("Segoe UI", 11F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(51, 51, 51),
-            Location = new Point(20, 58),
+            Location = new Point(28, 128),
             Text = "THANH TOÁN:"
         };
 
         _labelFinal = new Label
         {
             AutoSize = true,
-            Font = new Font("Segoe UI", 15F, FontStyle.Bold, GraphicsUnit.Point),
+            Font = new Font("Segoe UI", 16F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.FromArgb(0, 123, 255),
-            Location = new Point(150, 52),
+            Location = new Point(180, 120),
             Text = "0 đ"
         };
+
+        _buttonPrint = new RoundedButton
+        {
+            BackColor = Color.FromArgb(108, 117, 125),
+            BorderRadius = 12,
+            BorderSize = 0,
+            FlatStyle = FlatStyle.Flat,
+            Font = new Font("Segoe UI", 10.5F, FontStyle.Bold, GraphicsUnit.Point),
+            ForeColor = Color.White,
+            HoverBackColor = Color.FromArgb(88, 96, 105),
+            Location = new Point(700, 114),
+            Size = new Size(150, 58),
+            Text = "In hóa đơn"
+        };
+        _buttonPrint.FlatAppearance.BorderSize = 0;
 
         _buttonSave = new RoundedButton
         {
@@ -633,13 +731,13 @@ public class InvoiceEditorForm : Form, IInvoiceEditorView
             Font = new Font("Segoe UI", 11F, FontStyle.Bold, GraphicsUnit.Point),
             ForeColor = Color.White,
             HoverBackColor = Color.FromArgb(33, 150, 60),
-            Location = new Point(840, 50),
-            Size = new Size(120, 54),
-            Text = "Lưu hóa đơn"
+            Location = new Point(864, 114),
+            Size = new Size(140, 58),
+            Text = "Thanh toán"
         };
         _buttonSave.FlatAppearance.BorderSize = 0;
 
-        cardTotals.Controls.AddRange([_labelTotal, labelDiscountLbl, _numDiscount, _labelDiscount, labelFinalLbl, _labelFinal, _buttonSave]);
+        cardTotals.Controls.AddRange([_labelTotal, _labelPointsAvailable, labelPointsLbl, _numPoints, _labelPointsDeduct, labelFinalLbl, _labelFinal, _buttonPrint, _buttonSave]);
 
         panelContent.Controls.AddRange([cardCustomer, cardNote, cardCart, cardTotals]);
 

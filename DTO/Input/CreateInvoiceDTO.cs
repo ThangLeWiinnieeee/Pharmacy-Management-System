@@ -13,6 +13,9 @@ public class CreateInvoiceDTO
 
     public decimal Discount { get; set; }
 
+    /// <summary>Số điểm khách muốn dùng để trừ tiền (1 điểm = 1đ). Chỉ áp dụng khi có khách hàng.</summary>
+    public int PointsUsed { get; set; }
+
     public string? Note { get; set; }
 
     public List<InvoiceDetailInputDTO> Details { get; set; } = [];

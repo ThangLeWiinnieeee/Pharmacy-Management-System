@@ -6,4 +6,5 @@ public class CustomerLookupDTO
     public string Phone { get; set; } = string.Empty;
     public decimal TotalPurchases { get; set; }
     public int InvoiceCount { get; set; }
+    public int Points { get; set; }
 }

@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copy file nay thanh App.config roi dien thong tin that.
+  App.config da bi .gitignore -> KHONG commit mat khau len git.
+
+  Thu tu uu tien chuoi ket noi (xem DAL/AppDbContext.cs):
+    1. Bien moi truong  PHARMACY_DB
+    2. App.config       connectionStrings/PharmacyDb (ben duoi)
+    3. Fallback localhost
+
+  Vi du Supabase (Session pooler, IPv4 - nen dung):
+    Host=aws-0-<region>.pooler.supabase.com;Port=5432;Database=postgres;
+    Username=postgres.<project-ref>;Password=<pass>;
+    SSL Mode=Require;Trust Server Certificate=true
+-->
 <configuration>
   <connectionStrings>
     <add name="PharmacyDb"
-         connectionString="Data Source=<SQL_SERVER_NAME>;Initial Catalog=PharmacyManagementSystemDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True"
-         providerName="Microsoft.Data.SqlClient" />
+         connectionString="Host=aws-0-ap-southeast-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.PROJECT_REF;Password=YOUR_PASSWORD;SSL Mode=Require;Trust Server Certificate=true;Minimum Pool Size=2;Maximum Pool Size=20;Connection Idle Lifetime=300"
+         providerName="Npgsql" />
   </connectionStrings>
 </configuration>

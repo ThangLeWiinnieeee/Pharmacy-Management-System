@@ -28,7 +28,8 @@ public class CustomerDAL : ICustomerDAL
             Name = name,
             Phone = phone,
             TotalPurchases = invoices.Sum(i => i.FinalAmount),
-            InvoiceCount = invoices.Count
+            InvoiceCount = invoices.Count,
+            Points = customer?.Points ?? 0
         };
     }
 

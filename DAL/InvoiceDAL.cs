@@ -16,21 +16,51 @@ public class InvoiceDAL : IInvoiceDAL
         var invoiceCode = "HD" + DateTime.Now.ToString("yyMMddHHmmss");
 
         var totalAmount = request.Details.Sum(d => d.LineTotal);
-        var finalAmount = totalAmount - request.Discount;
+        var phone = string.IsNullOrWhiteSpace(request.CustomerPhone) ? null : request.CustomerPhone.Trim();
+
+        // Điểm tích lũy chỉ áp dụng cho khách hàng đã có trong hệ thống (theo SĐT)
+        var customer = phone is null ? null : context.Customers.FirstOrDefault(c => c.Phone == phone);
+
+        // Trừ điểm: kẹp trong [0, điểm hiện có] và không vượt số tiền phải trả (1 điểm = 1đ)
+        var payableBeforePoints = totalAmount - request.Discount;
+        if (payableBeforePoints < 0) payableBeforePoints = 0;
+
+        var pointsUsed = 0;
+        if (customer is not null && request.PointsUsed > 0)
+        {
+            pointsUsed = Math.Min(request.PointsUsed, customer.Points);
+            pointsUsed = (int)Math.Min(pointsUsed, payableBeforePoints);
+            if (pointsUsed < 0) pointsUsed = 0;
+        }
+
+        var finalAmount = payableBeforePoints - pointsUsed;
+        if (finalAmount < 0) finalAmount = 0;
+
+        // Cộng điểm: 1 điểm cho mỗi 1.000đ thực trả, chỉ khi có khách hàng
+        var pointsEarned = customer is not null ? (int)(finalAmount / 1000m) : 0;
 
         var invoice = new Invoice
         {
             InvoiceCode = invoiceCode,
-            CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? null : request.CustomerName.Trim(),
-            CustomerPhone = string.IsNullOrWhiteSpace(request.CustomerPhone) ? null : request.CustomerPhone.Trim(),
+            CustomerId = customer?.Id,
+            CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? customer?.Name : request.CustomerName.Trim(),
+            CustomerPhone = phone,
             CreatedByUserId = request.CreatedByUserId,
             TotalAmount = totalAmount,
             Discount = request.Discount,
-            FinalAmount = finalAmount < 0 ? 0 : finalAmount,
+            FinalAmount = finalAmount,
+            PointsUsed = pointsUsed,
+            PointsEarned = pointsEarned,
             Note = string.IsNullOrWhiteSpace(request.Note) ? null : request.Note.Trim(),
             Status = "Completed",
             CreatedAt = DateTime.Now
         };
+
+        // Cập nhật số dư điểm của khách
+        if (customer is not null)
+        {
+            customer.Points = customer.Points - pointsUsed + pointsEarned;
+        }
 
         foreach (var d in request.Details)
         {
@@ -117,6 +147,8 @@ public class InvoiceDAL : IInvoiceDAL
                 TotalAmount = i.TotalAmount,
                 Discount = i.Discount,
                 FinalAmount = i.FinalAmount,
+                PointsEarned = i.PointsEarned,
+                PointsUsed = i.PointsUsed,
                 Note = i.Note,
                 Status = i.Status,
                 CreatedAt = i.CreatedAt,
@@ -154,6 +186,8 @@ public class InvoiceDAL : IInvoiceDAL
             TotalAmount = invoice.TotalAmount,
             Discount = invoice.Discount,
             FinalAmount = invoice.FinalAmount,
+            PointsEarned = invoice.PointsEarned,
+            PointsUsed = invoice.PointsUsed,
             Note = invoice.Note,
             Status = invoice.Status,
             CreatedAt = invoice.CreatedAt,

@@ -11,8 +11,8 @@ public interface IInvoiceEditorView
     /// <summary>SĐT khách hàng nhập trên UI</summary>
     string CustomerPhone { get; }
 
-    /// <summary>Giảm giá nhập trên UI</summary>
-    decimal Discount { get; }
+    /// <summary>Số điểm khách chọn dùng để trừ tiền</summary>
+    int PointsUsed { get; }
 
     /// <summary>Ghi chú nhập trên UI</summary>
     string Note { get; }
@@ -26,11 +26,17 @@ public interface IInvoiceEditorView
 
     bool Confirm(string message);
 
+    /// <summary>Mở popup tổng kết thanh toán (sau khi bấm Thanh toán)</summary>
+    void OpenPaymentSummary();
+
+    /// <summary>Bật/tắt nút Thanh toán và In hóa đơn theo việc giỏ hàng có sản phẩm hay không</summary>
+    void SetActionsEnabled(bool enabled);
+
     /// <summary>Làm mới toàn bộ giỏ hàng và form sau khi lưu thành công</summary>
     void ResetForm(string newInvoiceCode);
 
     /// <summary>Cập nhật hiển thị tổng tiền</summary>
-    void RefreshTotals(decimal total, decimal discount, decimal finalAmount);
+    void RefreshTotals(decimal total, int pointsUsed, decimal finalAmount);
 
     /// <summary>Mở dialog chọn nhiều thuốc để thêm vào giỏ hàng</summary>
     IReadOnlyList<InvoiceDetailInputDTO>? RequestSelectMedicines();

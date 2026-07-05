@@ -43,27 +43,30 @@ public class InvoicePresenter
         RefreshTotals();
     }
 
-    /// <summary>Tính lại tổng tiền và cập nhật UI</summary>
+    /// <summary>Tính lại tổng tiền và cập nhật UI (chỉ trừ điểm, không còn giảm giá)</summary>
     public void RefreshTotals()
     {
         var items = _view.CartItems;
         var total = items.Sum(d => d.LineTotal);
-        var discount = _view.Discount;
-        var final = total - discount;
-        if (final < 0)
-        {
-            final = 0;
-        }
 
-        _view.RefreshTotals(total, discount, final);
+        // Kẹp điểm hiển thị không vượt số tiền phải trả (DAL vẫn là nguồn chốt cuối)
+        var pointsUsed = _view.PointsUsed;
+        if (pointsUsed > total) pointsUsed = (int)total;
+        if (pointsUsed < 0) pointsUsed = 0;
+
+        var final = total - pointsUsed;
+        if (final < 0) final = 0;
+
+        _view.RefreshTotals(total, pointsUsed, final);
+        _view.SetActionsEnabled(items.Count > 0);
     }
 
-    /// <summary>Xử lý lưu hóa đơn</summary>
-    public void SaveInvoice()
+    /// <summary>Bấm "Thanh toán": kiểm tra hợp lệ rồi mở popup tổng kết thanh toán.</summary>
+    public void Checkout()
     {
         if (_view.CartItems.Count == 0)
         {
-            _view.ShowError("Chưa có thuốc nào trong hóa đơn.\nVui lòng thêm ít nhất 1 loại thuốc trước khi lưu.");
+            _view.ShowError("Chưa có thuốc nào trong hóa đơn.\nVui lòng thêm ít nhất 1 loại thuốc trước khi thanh toán.");
             return;
         }
 
@@ -73,33 +76,24 @@ public class InvoicePresenter
             return;
         }
 
-        if (!_view.Confirm("Xác nhận lập hóa đơn?"))
-        {
-            return;
-        }
+        _view.OpenPaymentSummary();
+    }
 
+    /// <summary>Lưu hóa đơn vào DB từ trạng thái hiện tại của form. Gọi từ popup thanh toán.</summary>
+    public OperationResultDTO PersistInvoice()
+    {
         var request = new CreateInvoiceDTO
         {
             CreatedByUserId = _currentUserId,
             CustomerName = _view.CustomerName,
             CustomerPhone = _view.CustomerPhone,
-            Discount = _view.Discount,
+            Discount = 0,
+            PointsUsed = _view.PointsUsed,
             Note = _view.Note,
             Details = _view.CartItems.ToList()
         };
 
-        var result = _invoiceBLL.CreateInvoice(request);
-
-        if (result.IsSuccess)
-        {
-            var newCode = "HD" + DateTime.Now.ToString("yyMMddHHmmss");
-            _view.ResetForm(newCode);
-            _view.ShowMessage(result.Message);
-        }
-        else
-        {
-            _view.ShowError(result.Message);
-        }
+        return _invoiceBLL.CreateInvoice(request);
     }
 
     /// <summary>Tra cứu khách hàng theo SĐT và thông báo kết quả lên View</summary>

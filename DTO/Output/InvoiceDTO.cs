@@ -18,6 +18,10 @@ public class InvoiceDTO
 
     public decimal FinalAmount { get; set; }
 
+    public int PointsEarned { get; set; }
+
+    public int PointsUsed { get; set; }
+
     public string? Note { get; set; }
 
     public string Status { get; set; } = string.Empty;

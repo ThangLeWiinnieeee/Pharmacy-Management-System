@@ -2,7 +2,7 @@ namespace PharmacyManagementSystem;
 
 partial class EditCustomerDialog
 {
-    private System.ComponentModel.IContainer? components = null;
+    private System.ComponentModel.IContainer components = null;
 
     protected override void Dispose(bool disposing)
     {

@@ -22,6 +22,12 @@ public class Invoice
 
     public decimal FinalAmount { get; set; }
 
+    /// <summary>Điểm cộng cho khách sau hóa đơn này</summary>
+    public int PointsEarned { get; set; }
+
+    /// <summary>Điểm khách dùng để trừ tiền hóa đơn này (1 điểm = 1đ)</summary>
+    public int PointsUsed { get; set; }
+
     public string? Note { get; set; }
 
     /// <summary>Trạng thái: Completed, Cancelled</summary>

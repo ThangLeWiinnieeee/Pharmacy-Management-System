@@ -6,12 +6,16 @@ public class OperationResultDTO
 
     public string Message { get; set; } = string.Empty;
 
-    public static OperationResultDTO Success(string message)
+    /// <summary>Mã hóa đơn vừa tạo (dùng để in), null nếu thao tác không tạo hóa đơn</summary>
+    public string? InvoiceCode { get; set; }
+
+    public static OperationResultDTO Success(string message, string? invoiceCode = null)
     {
         return new OperationResultDTO
         {
             IsSuccess = true,
-            Message = message
+            Message = message,
+            InvoiceCode = invoiceCode
         };
     }
 

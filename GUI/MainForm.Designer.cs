@@ -47,6 +47,8 @@ namespace PharmacyManagementSystem
             employeeManagementView = new EmployeeManagementView();
             invoiceHistoryView = new InvoiceHistoryView();
             customerManagementView = new CustomerManagementView();
+            revenueReportView = new RevenueReportView();
+            formsPlotRevenue = new ScottPlot.WinForms.FormsPlot();
             panelPlaceholder = new Panel();
             panelPlaceholderCard = new RoundedPanel();
             labelPlaceholderTitle = new Label();
@@ -106,6 +108,7 @@ namespace PharmacyManagementSystem
 
             panelContent.BackColor = Color.FromArgb(248, 249, 250);
             panelContent.Controls.Add(panelPlaceholder);
+            panelContent.Controls.Add(revenueReportView);
             panelContent.Controls.Add(customerManagementView);
             panelContent.Controls.Add(invoiceHistoryView);
             panelContent.Controls.Add(employeeManagementView);
@@ -143,7 +146,27 @@ namespace PharmacyManagementSystem
                 Dock = DockStyle.Top,
                 Height = 20
             };
+            var labelRevenueSection = new Label
+            {
+                AutoSize = false, Dock = DockStyle.Top, Height = 36,
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold, GraphicsUnit.Point),
+                ForeColor = Color.FromArgb(51, 51, 51),
+                Padding = new Padding(0, 0, 0, 8),
+                TextAlign = ContentAlignment.BottomLeft,
+                Text = "Doanh thu"
+            };
+            var panelRevenueGap = new Panel
+            {
+                BackColor = Color.FromArgb(248, 249, 250),
+                Dock = DockStyle.Top,
+                Height = 20
+            };
 
+            formsPlotRevenue.Dock = DockStyle.Top;
+            formsPlotRevenue.Height = 260;
+            formsPlotRevenue.Name = "formsPlotRevenue";
+
+            panelDashboard.AutoScroll = true;
             panelDashboard.BackColor = Color.FromArgb(248, 249, 250);
             // Controls added in reverse — last added with Dock=Top appears topmost
             panelDashboard.Controls.Add(tablePeople);
@@ -151,6 +174,9 @@ namespace PharmacyManagementSystem
             panelDashboard.Controls.Add(panelSectionGap);
             panelDashboard.Controls.Add(tableMedicine);
             panelDashboard.Controls.Add(labelMedicineSection);
+            panelDashboard.Controls.Add(panelRevenueGap);
+            panelDashboard.Controls.Add(formsPlotRevenue);
+            panelDashboard.Controls.Add(labelRevenueSection);
             panelDashboard.Dock = DockStyle.Fill;
             panelDashboard.Location = new Point(28, 28);
             panelDashboard.Name = "panelDashboard";
@@ -280,6 +306,13 @@ namespace PharmacyManagementSystem
             customerManagementView.Size = new Size(876, 610);
             customerManagementView.TabIndex = 5;
             customerManagementView.Visible = false;
+
+            revenueReportView.Dock = DockStyle.Fill;
+            revenueReportView.Location = new Point(28, 28);
+            revenueReportView.Name = "revenueReportView";
+            revenueReportView.Size = new Size(876, 610);
+            revenueReportView.TabIndex = 6;
+            revenueReportView.Visible = false;
 
             panelPlaceholder.BackColor = Color.FromArgb(248, 249, 250);
             panelPlaceholder.Controls.Add(panelPlaceholderCard);
@@ -455,6 +488,8 @@ namespace PharmacyManagementSystem
         private EmployeeManagementView employeeManagementView;
         private InvoiceHistoryView invoiceHistoryView;
         private CustomerManagementView customerManagementView;
+        private RevenueReportView revenueReportView;
+        private ScottPlot.WinForms.FormsPlot formsPlotRevenue;
         // Medicine cards
         private RoundedPanel cardTotalMedicine;
         private Panel accentTotalMedicine;
